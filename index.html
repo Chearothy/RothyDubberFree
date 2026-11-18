@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Khmer Dubber Free</title>
 <style>
 :root{--bg:#0a0a1a;--card:#17142e;--card2:#0f0d20;--line:#2d2852;--tx:#f2f0ff;--mu:#9a95c4;--ac:#a855f7;--ac2:#38bdf8;--g:linear-gradient(135deg,#a855f7,#38bdf8)}
@@ -58,8 +58,8 @@ input[type=text],input[type=password],select.f,textarea{width:100%;background:va
 .lab{display:block;margin:14px 0 6px;color:var(--mu);font-size:13px;font-weight:600}
 textarea{font-family:monospace;font-size:13px;height:130px}
 .seg{padding:10px;border-bottom:1px solid var(--line);font-size:14px}.seg small{color:var(--ac2);display:block}
-.stage{position:relative;display:none;margin-top:14px}.stage video{display:block;margin:0}
-.ov{position:absolute;left:8%;right:8%;bottom:56px;text-align:center;color:#fff;font-weight:800;font-size:20px;text-shadow:0 2px 6px #000,0 0 3px #000;pointer-events:none}
+.stage{position:relative;display:none;margin-top:14px}.stage video{display:block;margin:0;min-height:170px}
+.ov{max-height:70%;overflow:hidden;position:absolute;left:8%;right:8%;bottom:56px;text-align:center;color:#fff;font-weight:800;font-size:20px;text-shadow:0 2px 6px #000,0 0 3px #000;pointer-events:none}
 .tools{display:flex;gap:8px;padding:0 16px 12px}.tl{background:#1c1a38;border:1px solid #3a3566;color:#b9b4e6;border-radius:10px;padding:6px 12px;font-size:13px}.tl.on{border-color:var(--ac);color:#d9c7ff}
 .ft{display:flex;gap:6px;padding:8px 14px;background:#000;font-size:13px}.ft button{background:none;border:0;color:#9a95c4;padding:7px 12px;border-radius:8px}.ft .on{background:#1c1a38;color:#fff}
 .ll{display:flex;gap:10px;margin-bottom:6px}.mu{color:#6f6a9c;flex:none}.tg{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;height:20px}
@@ -75,6 +75,25 @@ textarea{font-family:monospace;font-size:13px;height:130px}
 .mc h3{margin:0 0 4px;font-size:22px}.sw{display:flex;gap:10px;margin:6px 0 14px}.sw i{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;outline:0}.sw i.on{border-color:var(--tx)}
 .cdrop{border:2px dashed var(--line);border-radius:18px;padding:26px;text-align:center;cursor:pointer;margin:6px 0 14px}.cdrop.has{border-color:#34d399}
 .cl{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.cl i{width:14px;height:14px;border-radius:50%}
+
+@media(max-width:1000px){main{grid-template-columns:1fr;padding:18px 16px 48px;gap:16px}.hero{padding:36px 16px 18px}.panel{border-radius:24px}}
+@media(max-width:640px){
+ header{padding:10px 14px;gap:10px}header .logo{width:40px;height:40px;font-size:20px}h1{font-size:17px}h1 .pill{display:none}.sub{font-size:11.5px}
+ header .sp{display:none}header>.btn{padding:9px 12px}
+ .hero{padding:24px 12px 12px}.hero h2{margin:16px 0 8px}.hero p{font-size:14.5px}.badge{font-size:10.5px;padding:6px 14px}.chips{gap:6px}.chips span{font-size:12px;padding:6px 11px}
+ main{padding:12px 10px 40px}.panel{padding:14px;border-radius:20px}
+ .drop{padding:14px;gap:12px}.up{width:46px;height:46px}.drop b{font-size:15px}
+ .row{gap:10px}.go{width:100%}.go button{flex:1;padding:14px 10px;font-size:16px}.go select{padding:0 8px}
+ .row input[type=range]{min-width:60px}.tgrow select{flex:1}
+ .steps{gap:6px}.step{padding:9px 8px;font-size:12.5px;gap:6px;flex-direction:column;text-align:center}.step i{width:24px;height:24px}
+ #log{height:170px;font-size:12px}.ll{gap:6px}.tools{flex-wrap:wrap}
+ .sr{flex-wrap:wrap}.sr input{flex:1 1 100%;order:5}.exp{width:100%}
+ .tabs button{padding:10px 4px;font-size:13px}.krow{flex-wrap:wrap}.krow input{min-width:0}
+ .modal{padding:0;place-items:end center}.mc{width:100%!important;border-radius:22px 22px 0 0;max-height:94vh;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+}
+@media(hover:none){.btn,.tl,.gb,.tabs button{min-height:42px}}
+@media(min-width:1600px){main{max-width:1560px}.hero h2{font-size:72px}}
+body{padding-bottom:env(safe-area-inset-bottom)}
 a{color:var(--ac2)}
 </style></head>
 <body>
@@ -87,7 +106,7 @@ a{color:var(--ac2)}
 
 <section class="hero">
  <span class="badge"><i></i>AI DUBBING STUDIO · ភាសាខ្មែរ</span>
- <h2>Dub any video into <span>Khmer</span></h2>
+ <h2>Dub any video into <span id="hl">Khmer</span></h2>
  <p>Transcribe, translate, and synthesize natural Khmer voices in one click — right in your browser. Your video never leaves your device.</p>
  <div class="chips"><span>Free-tier friendly</span><span>Natural Khmer voices</span><span>100% private</span><span>Frame-accurate export</span></div>
 </section>
@@ -97,13 +116,15 @@ a{color:var(--ac2)}
  <div class="drop" id="drop"><div class="up">⬆</div><div><b id="dn">Drop a video here or click to browse</b><small>MP4, MOV, WebM · the file never leaves your device</small></div></div>
  <input type="file" id="file" accept="video/*" hidden>
  <div class="stage" id="stage"><video id="vid" controls></video><div class="ov" id="ov2"></div></div>
+ <div class="row tgrow"><span class="muted">🌐 From</span><select class="f" id="src" style="width:auto;min-width:170px"><option value="auto">✨ Auto-detect</option><option value="Chinese (any dialect: Mandarin, Cantonese, Traditional or Simplified)">Chinese (all)</option><option value="Chinese (Mandarin)">Chinese – Mandarin</option><option value="Cantonese">Chinese – Cantonese</option><option value="English">English</option><option value="Filipino (Tagalog)">Filipino</option><option value="Thai">Thai</option><option value="Khmer">Khmer</option><option value="Vietnamese">Vietnamese</option><option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Indonesian">Indonesian</option><option value="Malay">Malay</option><option value="Lao">Lao</option><option value="Burmese (Myanmar)">Burmese</option><option value="Hindi">Hindi</option><option value="Arabic">Arabic</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option><option value="Russian">Russian</option><option value="Portuguese">Portuguese</option><option value="Turkish">Turkish</option></select><span class="muted">→ Translate to</span>
+  <select class="f" id="tgt" style="width:auto;min-width:170px"><option value="km">Khmer (ភាសាខ្មែរ)</option><option value="en">English</option></select></div>
  <div class="row">
   <span class="muted">🔈 Original audio</span><input type="range" id="orig" min="0" max="100" value="0"><span class="muted" id="ov">0%</span>
   <div class="go"><button id="run" disabled>✦ Dub to Khmer</button>
    <select id="mode"><option>Full Dub</option><option>Subtitles only</option></select></div>
  </div>
  <div class="bar"><div id="prog"></div></div>
- <div class="steps"><div class="step" id="s1"><i>1</i>Transcribe</div><div class="step" id="s2"><i>2</i>Translate</div><div class="step" id="s3"><i>3</i>Khmer voice</div></div>
+ <div class="steps"><div class="step" id="s1"><i>1</i>Transcribe</div><div class="step" id="s2"><i>2</i>Translate</div><div class="step" id="s3"><i>3</i><span id="s3t">Khmer voice</span></div></div>
  <div class="term">
   <div class="th"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>&nbsp;SYSTEM DIAGNOSTICS<span class="sp"></span><span class="on-l">● ONLINE</span></div>
   <div class="tools"><button class="tl on" id="auto">◉ Auto-scroll</button><button class="tl" id="lcopy">⧉ Copy</button><button class="tl" id="lclr">🗑 Clear</button></div>
@@ -141,7 +162,7 @@ a{color:var(--ac2)}
    <label class="lab">Text model (transcribe + translate)</label><input type="text" id="tm" list="dl-text" value="gemini-3.5-flash-lite">
    <label class="lab">Gemini voice model</label><input type="text" id="vm" list="dl-tts" value="gemini-3.8-flash-lite-tts">
    <label class="lab">Male / female Gemini voices</label><div class="krow"><input type="text" id="vmale" value="Charon"><input type="text" id="vfem" value="Kore"></div>
-   <label class="lab">Max speed-up to fit timing: <span id="spv">1.4</span>×</label><input type="range" id="sp" min="1" max="2" step="0.1" value="1.4" style="width:100%">
+   <label class="lab">Max speed-up to fit timing: <span id="spv">1.25</span>×</label><input type="range" id="sp" min="1" max="2" step="0.05" value="1.25" style="width:100%">
    <p class="muted">Piseth = male, Sreymom = female. With the browser engine, voices are the Khmer ones installed in your browser (Microsoft Edge ships both) and can’t be exported.</p>
   </div>
   <div class="tab" id="t3">
@@ -238,7 +259,7 @@ async function gem(path,body,method='POST'){
  }
  throw last;
 }
-$('#chk').onclick=async()=>{const ks=keys;for(let i=0;i<ks.length;i++){if(!ks[i])continue;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',{headers:{'x-goog-api-key':ks[i]}});kst[i]=r.ok?'ok':'bad';log(`Key #${i+1}: ${r.ok?'OK':'invalid ('+r.status+')'}`,'ai',r.ok?'ok':'err')}catch(e){kst[i]='bad';log(`Key #${i+1}: ${e.message}`,'ai','err')}}drawKeys();await syncKeys(ks.filter((k,i)=>k&&kst[i]==='ok'))};
+$('#chk').onclick=async()=>{const ks=keys;for(let i=0;i<ks.length;i++){if(!ks[i])continue;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',{headers:{'x-goog-api-key':ks[i]}});kst[i]=r.ok?'ok':'bad';log(`Key #${i+1}: ${r.ok?'OK':'invalid ('+r.status+')'}`,'ai',r.ok?'ok':'err')}catch(e){kst[i]='bad';log(`Key #${i+1}: ${e.message}`,'ai','err')}}drawKeys();{const ok=ks.filter((k,i)=>k&&kst[i]==='ok');if(ok.length)await syncKeys(ok);else log('No valid key to sync to Google.','ai','warn')}};
 $('#lm').onclick=async()=>{try{ki=0;const j=await gem('models?pageSize=100',null,'GET');const ns=j.models.filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));$('#models').value=ns.join('\n');$('#dl-text').innerHTML=ns.filter(x=>!/tts|image|embed|live|native-audio|lyria|robotics/.test(x)).map(x=>`<option value="${x}">`).join('');$('#dl-tts').innerHTML=ns.filter(x=>/tts/.test(x)).map(x=>`<option value="${x}">`).join('');log('Models loaded.','ai','ok')}catch(e){log('Load models failed: '+e.message,'ai','err')}};
 /* upload */
 const drop=$('#drop');
@@ -272,7 +293,10 @@ function parseSrt(t){return t.replace(/\\n/g,'\n').replace(/\r/g,'').split(/\n\s
 const gOf=s=>{if(s.v&&(s.v[0]!=='c'||clones.some(x=>'c:'+x.id===s.v)))return s.v;const r=$('#route').value;return r==='auto'?s.g:r};
 const cl=s=>{const r=gOf(s);return r[0]==='c'?clones.find(x=>'c:'+x.id===r):null};
 const gs=s=>{const c=cl(s);return c?c.g:gOf(s)};
-const lbl=s=>{const c=cl(s);return c?c.name:gOf(s)==='m'?'Piseth':'Sreymom'};
+const SL=()=>{const v=$('#src').value;return v==='auto'?'Listen to this audio and automatically detect the spoken language (it can be any language).':`Listen to this audio. The speech is in ${v}.`};
+const LG=()=>$('#tgt').value,TN=()=>LG()==='km'?'Khmer (ភាសាខ្មែរ)':'English',NM=()=>LG()==='km'?['Piseth','Sreymom']:['Male','Female'];
+const lbl=s=>{const c=cl(s);return c?c.name:gOf(s)==='m'?NM()[0]:NM()[1]};
+const parseJ=t=>{t=t.replace(/```json|```/g,'');const m=t.match(/\[[\s\S]*\]/);if(!m)throw new Error('The model returned no usable subtitles: '+t.slice(0,120));return JSON.parse(m[0])};
 const norm=a=>a.filter(s=>s.text&&s.end>s.start).map(s=>({start:+s.start,end:+s.end,text:String(s.text),g:/^f/i.test(s.gender||'')?'f':'m'}));
 
 /* voice clones */
@@ -313,9 +337,20 @@ $('#cok').onclick=async()=>{const name=$('#cname').value.trim();if(!name)return 
 drawClones();
 
 /* settings (password gate, backup, sheet sync) */
-async function syncKeys(list){if(!list.length)return;const u=(($('#gsurl')||{}).value||'').trim();
+async function syncKeys(list,verbose){
+ if(!list.length){if(verbose)log('No API keys to save.','ai','warn');return}
+ const u=(($('#gsurl')||{}).value||'').trim();
  if(!u)return log('Keys not synced to Google: add the Apps Script URL in ⚙ Settings.','ai','warn');
- try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({secret:$('#gssec').value,keys:list})});}catch(e){log('Google sync failed: '+e.message,'ai','err')}}
+ const body=JSON.stringify({secret:$('#gssec').value,keys:list});
+ try{
+  const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body,redirect:'follow'});
+  const t=(await r.text()).trim();
+  if(t==='ok'){if(verbose)log(`Saved ${list.length} key(s) to Google Sheet.`,'ai','ok');return}
+  if(t==='denied')return log('Google Sheet sync denied: the Secret in ⚙ Settings does not match SECRET in your Apps Script.','ai','err');
+  log('Google Sheet sync failed: the Apps Script gave an unexpected reply. In Apps Script use Deploy → Manage deployments: Execute as “Me”, Who has access “Anyone”, and deploy the new code as a New version.','ai','err')
+ }catch(e){
+  try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body});log('Sent to Google Sheet, but the browser could not read the reply. Please check the sheet.','ai','warn')}catch(e2){log('Google sync failed: '+e2.message,'ai','err')}
+ }}
 let unlocked=false,impKind='';
 const SHEET_CODE=`const SECRET='change-me';
 function doPost(e){const d=JSON.parse(e.postData.contents);
@@ -355,11 +390,11 @@ $('#impf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)
   if(impKind==='kd-keys'){const have=new Set(keys);let n=0;(j.keys||[]).forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();log(`Imported ${n} new API key(s).`,'ai','ok')}
   else{const ids=new Set(clones.map(c=>c.id));let n=0;(j.clones||[]).forEach(c=>{if(c&&c.id&&!ids.has(c.id)){clones.push(c);n++}});saveClones();drawClones();log(`Imported ${n} new clone voice(s).`,'voice','ok')}
  }catch(err){log('Import failed: '+err.message,'ai','err')}};
-$('#gssave').onclick=async()=>{const u=$('#gsurl').value.trim(),k=keys.filter(Boolean);if(!u)return log('Saving needs the Apps Script Web app URL (setup code below). Or press “Copy keys” and paste them into the sheet.','ai','warn');if(!k.length)return log('No API keys to save.','ai','warn');
- try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({secret:$('#gssec').value,keys:k})});log(`Sent ${k.length} key(s) to your Google Sheet. Open the sheet to confirm.`,'ai','ok')}catch(e){log('Sheet save failed: '+e.message,'ai','err')}};
+$('#gssave').onclick=()=>syncKeys(keys.filter(Boolean),true);
 $('#gsload').onclick=async()=>{const u=$('#gsurl').value.trim();if(!u)return loadDirect();
  try{const r=await fetch(u+(u.includes('?')?'&':'?')+'secret='+encodeURIComponent($('#gssec').value));const t=await r.text();if(t==='denied')throw new Error('Wrong secret.');
   const a=JSON.parse(t),have=new Set(keys);let n=0;a.forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();}catch(e){log('Sheet load failed: '+e.message,'ai','err')}};
+$('#tgt').onchange=()=>{$('#hl').textContent=LG()==='km'?'Khmer':'English';$('#s3t').textContent=LG()==='km'?'Khmer voice':'English voice';if(segs.length)renderSegs()};
 /* model fallback */
 async function gm(kind,body){const inp=$(kind==='tts'?'#vm':'#tm');
  const fb=kind==='tts'?['gemini-3.8-flash-lite-tts','gemini-3.8-flash-tts','gemini-3.1-flash-tts-preview','gemini-2.5-flash-preview-tts','gemini-2.5-pro-preview-tts']:['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-3.8-flash','gemini-flash-latest'];
@@ -367,25 +402,40 @@ async function gm(kind,body){const inp=$(kind==='tts'?'#vm':'#tm');
   try{if(kind==='text')body.generationConfig.thinkingConfig={thinkingLevel:'minimal'};let r;try{r=await gem(`models/${m}:generateContent`,body)}catch(e){if(/think/i.test(e.message)&&body.generationConfig.thinkingConfig){delete body.generationConfig.thinkingConfig;r=await gem(`models/${m}:generateContent`,body)}else throw e}if(m!==inp.value){inp.value=m;log(`Switched to model <b>${m}</b>.`,'ai','ok')}return r}
   catch(e){if(!/no longer available|not found|not supported|404|deprecated|quota|exceeded|exhausted/i.test(e.message))throw e;log(`Model ${m} unavailable, trying next…`,'ai','warn')}}
  throw new Error('No working model found. Pick one in the Pipeline tab (use Load Models to see yours).')}
+const outText=o=>{const c=o.candidates&&o.candidates[0];if(!c||!c.content)throw new Error('No response from the model ('+((c&&c.finishReason)||(o.promptFeedback&&o.promptFeedback.blockReason)||'empty')+').');return c.content.parts.map(p=>p.text||'').join('')};
+const badTr=(t,o)=>/(.{1,12})\1{4,}/u.test(t)||t.length>Math.max(40,o.length*4);
+async function translateSegs(list){
+ const src=$('#src').value==='auto'?'the original language (detect it)':$('#src').value;
+ const prompt=`Translate the "text" of every item from ${src} into natural, accurate, fluent ${TN()}. Keep the meaning faithful. Never repeat words or phrases. If an item is already in ${TN()}, keep it. Return the same number of items with the same start, end and gender. Return ONLY the JSON array.\n`+JSON.stringify(list.map(s=>({start:s.start,end:s.end,text:s.text,gender:s.g==='f'?'female':'male'})));
+ const models=[...new Set([$('#tm').value,'gemini-3.8-flash','gemini-3.7-flash','gemini-3.5-flash','gemini-flash-latest'])];
+ for(const m of models){
+  try{const r=await gem(`models/${m}:generateContent`,{contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:.2}});
+   const a=norm(parseJ(outText(r)));
+   if(a.length!==list.length)throw new Error(`got ${a.length} items, expected ${list.length}`);
+   const bi=a.findIndex((x,i)=>badTr(x.text,list[i].text));if(bi>=0)throw new Error('repeating/garbled text in item '+(bi+1));
+   log(`Translated with <b>${m}</b>.`,'ai','ok');
+   return a.map((x,i)=>({start:list[i].start,end:list[i].end,text:x.text,g:list[i].g,src:list[i].text}))
+  }catch(e){log(`Translation by ${m} rejected: ${e.message.slice(0,150)} — trying a stronger model…`,'ai','warn')}}
+ throw new Error('Translation failed on every model. Try again later or choose another text model in Pipeline.')}
 /* pipeline */
 $('#run').onclick=async()=>{
  const b=$('#run');b.disabled=true;ki=0;segs=[];buffers=[];prog(0);stopAll();
  try{
-  const custom=$('#srtin').value.trim();dur=v.duration||0;let out;
-  const tm=`models/${$('#tm').value}:generateContent`,gen={responseMimeType:'application/json'};
-  const ask='Return ONLY a JSON array: [{"start":seconds,"end":seconds,"text":"natural spoken Khmer (ភាសាខ្មែរ)","gender":"male or female (speaker gender, inferred from voice/context)"}].';
+  const custom=$('#srtin').value.trim();dur=v.duration||0;let list;
   if(custom){
-   step(1);const p=parseSrt(custom);if(!p.length)throw new Error('Could not parse the SRT subtitles.');log(`Using custom SRT (${p.length} cues).`,'ai','ok');prog(15);step(2);
-   log('Translating subtitles to Khmer…');
-   out=await gm("text",{contents:[{parts:[{text:'Translate these subtitle cues into Khmer, keeping the same count and timings. '+ask+'\n'+JSON.stringify(p)}]}],generationConfig:gen});
+   step(1);const p=parseSrt(custom);if(!p.length)throw new Error('Could not parse the SRT subtitles.');log(`Using custom SRT (${p.length} cues).`,'ai','ok');prog(15);
+   list=p.map(x=>({...x,g:'m'}));
   }else{
    step(1);log('Extracting audio in browser…','voice');const wb=await extractAudio(file);log(`Audio ready: ${dur.toFixed(1)}s`,'voice','ok');prog(10);
-   log('Transcribing & translating with Gemini…');
-   out=await gm("text",{contents:[{parts:[{inline_data:{mime_type:'audio/wav',data:b64(wb)}},{text:'Transcribe the speech in this audio and translate it into Khmer with accurate timestamps. '+ask+` Audio length ${dur.toFixed(1)}s.`}]}],generationConfig:gen});
-   step(2);
+   log('Step 1/2: transcribing the original speech…');
+   const out=await gm("text",{contents:[{parts:[{inline_data:{mime_type:'audio/wav',data:b64(wb)}},{text:`${SL()} Transcribe exactly what is said, word for word, in the ORIGINAL spoken language (do NOT translate). Split it into sentences or short phrases with accurate timestamps in seconds. If there is no speech, return []. Return ONLY a JSON array: [{"start":seconds,"end":seconds,"text":"original-language text","gender":"male or female (speaker gender)"}]. Audio length ${dur.toFixed(1)}s.`}]}],generationConfig:{responseMimeType:'application/json',temperature:0}});
+   list=norm(parseJ(outText(out)));if(!list.length)throw new Error('No speech was detected in this video.');
+   {const nf=list.filter(x=>x.g==='f').length,mn=Math.min(nf,list.length-nf);if(mn&&mn/list.length<=.3){const g=nf>list.length/2?'f':'m';list.forEach(x=>x.g=g);log('One main speaker detected — using a single voice for all lines.','voice')}}
+   log('Heard: '+list.slice(0,6).map(x=>x.text.replace(/</g,'&lt;')).join(' | ').slice(0,400),'ai');
   }
-  segs=norm(JSON.parse(out.candidates[0].content.parts.map(p=>p.text||'').join('').replace(/```json|```/g,'')));
-  log(`<b>${segs.length}</b> Khmer segments ready.`,'ai','ok');prog(40);renderSegs();
+  step(2);prog(25);log(`Step 2/2: translating ${list.length} segment(s) to ${TN()}…`);
+  segs=await translateSegs(list);
+  log(`<b>${segs.length}</b> translated segments ready.`,'ai','ok');prog(40);renderSegs();
   if($('#mode').value==='Subtitles only'){step(4);prog(100)}else await makeVoices();
  }catch(e){log('Error: '+e.message,'ai','err');console.error(e)}
  b.disabled=false};
@@ -396,10 +446,11 @@ function fixBuf(ab,c){const d=ab.getChannelData(0).slice(),sr=ab.sampleRate,W=Ma
  const runs=[];for(let k=0;k<n;){if(act[k]){let j=k;while(j<n&&act[j])j++;if(runs.length&&k-runs[runs.length-1][1]<5)runs[runs.length-1][1]=j;else runs.push([k,j]);k=j}else k++}
  runs.forEach(([a,b],i)=>{let zc=0,pk=0;for(let t=a*W+1;t<b*W;t++){if((d[t]>=0)!==(d[t-1]>=0))zc++;pk=Math.max(pk,Math.abs(d[t]))}
   zc/=(b-a)*W;const ln=(b-a)*W/sr,gb=i?(a-runs[i-1][1])*W/sr:9,ga=i<runs.length-1?(runs[i+1][0]-b)*W/sr:9;
-  if(ln<.4&&zc>.1&&pk>.9&&gb>=.1&&ga>=.1){d.fill(0,Math.max(0,a-1)*W,(b+1)*W);log('Removed a noisy burst at the end of a clip.','voice','info')}});
+  if(gb>=.08&&ga>=.08&&((ln<=.06&&pk>.3)||(ln<.4&&zc>.1&&pk>.5))){d.fill(0,Math.max(0,a-1)*W,(b+1)*W);log('Removed a noisy burst at the end of a clip.','voice','info')}});
  let end=d.length;while(end>0&&Math.abs(d[end-1])<.002)end--;end=Math.min(d.length,end+Math.round(sr*.05));
- const f=Math.round(sr*.015);for(let k=0;k<f&&end-1-k>=0;k++)d[end-1-k]*=k/f;
- const o=c.createBuffer(1,Math.max(1,end),sr);o.getChannelData(0).set(d.subarray(0,end));return o}
+ const f=Math.round(sr*.03);for(let k=0;k<f&&end-1-k>=0;k++)d[end-1-k]*=k/f;
+ let st=0;while(st<end&&Math.abs(d[st])<.002)st++;st=Math.max(0,st-Math.round(sr*.03));if(end-st<sr*.1)st=0;const fi=Math.round(sr*.01);for(let k=0;k<fi&&st+k<end;k++)d[st+k]*=k/fi;
+ const o=c.createBuffer(1,Math.max(1,end-st),sr);o.getChannelData(0).set(d.subarray(st,end));return o}
 function splitBuf(ab,idx,c){
  if(idx.length===1){buffers[idx[0]]=fixBuf(ab,c);return}
  const d=ab.getChannelData(0),sr=24000,w=Math.round(sr*.02),tot=idx.reduce((a,i)=>a+segs[i].text.length,0);
@@ -419,7 +470,7 @@ async function voiceGroup(idx,name){const c=getCtx();
 const voiceOne=i=>voiceGroup([i],vname(segs[i]));
 async function makeVoices(){
  step(3);buffers=[];$('#vnote').textContent='';
- if($('#eng').value==='browser'){const n=speechSynthesis.getVoices().filter(x=>x.lang.startsWith('km')).length;
+ if($('#eng').value==='browser'){const n=speechSynthesis.getVoices().filter(x=>x.lang.startsWith(LG())).length;
   log(n?`Browser Khmer voices found: ${n}. Press play on the video.`:'No Khmer voice installed in this browser (try Microsoft Edge).','voice',n?'ok':'warn');step(4);prog(100);return}
  const c=getCtx();
  const groups={};segs.forEach((s,i)=>{const n=vname(s);(groups[n]=groups[n]||[]).push(i)});let done=0;const gk=Object.keys(groups);
@@ -432,8 +483,8 @@ async function makeVoices(){
 function renderSegs(){$('#res').style.display='block';const box=$('#segs');box.innerHTML='';
  segs.forEach((s,i)=>{const r=document.createElement('div');r.className='sr';
   r.innerHTML='<span class="tb"></span><button class="gb"></button><input><button class="btn x">✕</button>';
-  const [tb,gb,inp,x]=r.children;tb.textContent=mmss(s.start);inp.value=s.text;inp.oninput=()=>s.text=inp.value;
-  const sg=()=>{const c=cl(s);gb.className='gb '+(c?'cv':gs(s));gb.style.cssText=c?`color:${c.color};background:${c.color}22`:'';gb.textContent=c?'🎙 '+c.name:gs(s)==='m'?'♂ Piseth':'♀ Sreymom';gb.title='Click to switch voice'};sg();
+  const [tb,gb,inp,x]=r.children;tb.textContent=mmss(s.start);inp.value=s.text;inp.title=s.src?'Original: '+s.src:'';inp.oninput=()=>s.text=inp.value;
+  const sg=()=>{const c=cl(s);gb.className='gb '+(c?'cv':gs(s));gb.style.cssText=c?`color:${c.color};background:${c.color}22`:'';gb.textContent=c?'🎙 '+c.name:gs(s)==='m'?'♂ '+NM()[0]:'♀ '+NM()[1];gb.title='Click to switch voice'};sg();
   gb.onclick=()=>{const list=['m','f',...clones.map(c=>'c:'+c.id)];s.v=list[(list.indexOf(gOf(s))+1)%list.length];sg();if(buffers.length&&$('#eng').value==='gemini'){buffers[i]=null;voiceOne(i)}};
   x.onclick=()=>{segs.splice(i,1);buffers.splice(i,1);renderSegs()};box.appendChild(r)})}
 $('#bvoice').onclick=()=>makeVoices().catch(e=>log('Voice error: '+e.message,'voice','err'));
@@ -441,21 +492,22 @@ $('#breplay').onclick=()=>{v.currentTime=0;v.play()};
 const save=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()};
 $('#srt').onclick=()=>save(new Blob([segs.map((s,i)=>`${i+1}\n${fmt(s.start)} --> ${fmt(s.end)}\n${s.text}\n`).join('\n')],{type:'text/plain'}),'khmer.srt');
 /* playback */
-const rate=i=>Math.min(parseFloat($('#sp').value),Math.max(1,buffers[i].duration/(segs[i].end-segs[i].start)));
+/* sequential, non-overlapping schedule: a clip never starts before the previous one has ended */
+function plan(){let prev=0;const total=dur||v.duration||0;return segs.map((s,i)=>{if(!buffers[i])return null;const d=buffers[i].duration,t=Math.max(s.start,prev+.1),nx=i+1<segs.length?segs[i+1].start:Math.max(total,t+d),avail=Math.max(.6,nx-t),r=Math.min(parseFloat($('#sp').value),Math.max(1,d/avail)),end=t+d/r;prev=end;return{t,r,end}})}
 function stopAll(){srcs.forEach(s=>{try{s.stop()}catch(e){}});srcs=[];timers.forEach(clearTimeout);timers=[];try{speechSynthesis.cancel()}catch(e){}}
-function speak(s){const u=new SpeechSynthesisUtterance(s.text),vs=speechSynthesis.getVoices().filter(x=>x.lang.startsWith('km'));
- const pick=vs.find(x=>x.name.includes(gs(s)==='m'?'Piseth':'Sreymom'))||vs[0];if(pick)u.voice=pick;u.lang='km-KH';speechSynthesis.speak(u)}
+function speak(s){const u=new SpeechSynthesisUtterance(s.text),vs=speechSynthesis.getVoices().filter(x=>x.lang.startsWith(LG()));
+ const pick=(LG()==='km'?vs.find(x=>x.name.includes(gs(s)==='m'?'Piseth':'Sreymom')):vs.find(x=>(gs(s)==='m'?/david|mark|guy|ryan|male/i:/zira|aria|jenny|female|samantha/i).test(x.name)))||vs[0];if(pick)u.voice=pick;u.lang=LG()==='km'?'km-KH':'en-US';speechSynthesis.speak(u)}
 function playDub(){stopAll();const cur=v.currentTime;
  if($('#eng').value==='browser'){segs.forEach(s=>{if(s.end>cur)timers.push(setTimeout(()=>speak(s),Math.max(0,(s.start-cur)*1000)))});return}
  if(!buffers.length)return;const c=getCtx();c.resume();const now=c.currentTime;
- segs.forEach((s,i)=>{if(!buffers[i]||s.end<=cur)return;const src=c.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=rate(i);src.connect(c.destination);if(exporting)src.connect(exporting);
-  const d=s.start-cur;if(d>=0)src.start(now+d);else src.start(now,-d*src.playbackRate.value);srcs.push(src)})}
+ plan().forEach((p,i)=>{if(!p||p.end<=cur)return;const src=c.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=p.r;src.connect(c.destination);if(exporting)src.connect(exporting);
+  const d=p.t-cur;if(d>=0)src.start(now+d);else src.start(now,-d*p.r);srcs.push(src)})}
 v.addEventListener('play',playDub);v.addEventListener('pause',stopAll);v.addEventListener('seeked',()=>{if(!v.paused)playDub()});
-v.addEventListener('timeupdate',()=>{const t=v.currentTime,s=segs.find(s=>t>=s.start&&t<s.end);$('#ov2').textContent=s?s.text:''});
+v.addEventListener('timeupdate',()=>{const t=v.currentTime,s=segs.find(s=>t>=s.start&&t<s.end);const o=$('#ov2'),t2=s?s.text:'';o.textContent=t2;o.style.fontSize=t2.length>110?'13px':t2.length>60?'16px':''});
 /* exports */
 $('#dl').onclick=async()=>{if(!buffers.some(Boolean))return log('No generated voice audio to export (Gemini engine required).','voice','warn');
- const sr=24000,off=new OfflineAudioContext(1,Math.ceil((dur||v.duration)*sr),sr);
- segs.forEach((s,i)=>{if(!buffers[i])return;const src=off.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=rate(i);src.connect(off.destination);src.start(s.start)});
+ const sr=24000,pl=plan(),tot=Math.max(dur||v.duration||0,...pl.filter(Boolean).map(p=>p.end))+.3,off=new OfflineAudioContext(1,Math.ceil(tot*sr),sr);
+ pl.forEach((p,i)=>{if(!p)return;const src=off.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=p.r;src.connect(off.destination);src.start(p.t)});
  save(new Blob([wav((await off.startRendering()).getChannelData(0),sr)],{type:'audio/wav'}),'khmer-dub.wav');log('Exported khmer-dub.wav','voice','ok')};
 $('#exp').onclick=()=>{
  if(!buffers.some(Boolean))return log('Export needs generated Gemini voice audio.','voice','warn');

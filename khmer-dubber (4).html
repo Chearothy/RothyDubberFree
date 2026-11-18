@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khmer Dubber Free</title>
+<style>
+:root{--bg:#0a0a1a;--card:#17142e;--card2:#0f0d20;--line:#2d2852;--tx:#f2f0ff;--mu:#9a95c4;--ac:#a855f7;--ac2:#38bdf8;--g:linear-gradient(135deg,#a855f7,#38bdf8)}
+:root.light{--bg:#f4f2ff;--card:#fff;--card2:#f0edff;--line:#d9d3f5;--tx:#1c1840;--mu:#6b66a0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(900px 500px at 20% -10%,#3b1d6e55,transparent),var(--bg);color:var(--tx);min-height:100vh}
+header{display:flex;align-items:center;gap:14px;padding:14px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{width:48px;height:48px;border-radius:14px;background:var(--g);display:grid;place-items:center;font-size:24px}
+h1{margin:0;font-size:22px}.sub{color:var(--mu);font-size:13px}
+.sp{flex:1}.pill{padding:3px 10px;border:1px solid var(--line);border-radius:99px;font-size:12px;color:var(--ac2);background:var(--card2)}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--card2);padding:8px 14px;border-radius:10px;font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--ac)}
+.hero{text-align:center;padding:48px 16px 24px}
+.badge{display:inline-block;padding:8px 20px;border:1px solid var(--line);border-radius:99px;font-size:12px;letter-spacing:.15em;font-weight:700;color:var(--mu)}
+.badge i{display:inline-block;width:8px;height:8px;background:#34d399;border-radius:50%;margin-right:8px}
+.hero h2{font-size:clamp(34px,6vw,64px);margin:22px 0 10px}
+.hero h2 span{background:var(--g);-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--mu);max-width:640px;margin:0 auto 22px;font-size:17px}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.chips span{padding:8px 16px;border:1px solid var(--line);border-radius:99px;font-size:14px;color:var(--mu)}
+.chips span:before{content:"✦ ";color:var(--ac2)}
+main{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;padding:24px 28px 60px;max-width:1400px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:22px}
+.drop{display:flex;gap:16px;align-items:center;border:2px dashed #6d4fc7;border-radius:20px;padding:20px;cursor:pointer;background:#6d4fc715}
+.drop.over{background:#6d4fc740}
+.up{width:56px;height:56px;border-radius:16px;background:var(--g);display:grid;place-items:center;font-size:26px;flex:none}
+.drop b{font-size:17px}.drop small{display:block;color:var(--mu);margin-top:4px}
+video{width:100%;border-radius:16px;background:#000;max-height:360px}
+.row{display:flex;gap:14px;align-items:center;margin:18px 0;flex-wrap:wrap}
+input[type=range]{accent-color:var(--ac);flex:1;min-width:90px}
+.go{display:flex;border-radius:16px;overflow:hidden;background:#5b3fb0}
+.go button{background:none;border:0;padding:16px 22px;font-weight:700;font-size:18px;color:#fff}
+.go button:disabled{opacity:.5;cursor:not-allowed}
+.go select{background:#4a3394;color:#fff;border:0;border-left:1px solid #fff3;padding:0 10px;font-weight:700}
+.bar{height:10px;border-radius:9px;background:var(--card2);overflow:hidden}.bar div{height:100%;width:0;background:var(--g);transition:width .3s}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.step{display:flex;gap:10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card2);color:var(--mu);font-weight:600}
+.step i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:13px}
+.step.on{color:var(--tx);border-color:var(--ac)}.step.on i{background:var(--ac)}.step.ok i{background:#34d399;color:#000}
+.term{background:#05050f;border:1px solid var(--line);border-radius:20px;overflow:hidden;color:#d6d3f5}
+.th{display:flex;align-items:center;gap:8px;padding:12px 16px;font-family:monospace;font-weight:700;font-size:13px;letter-spacing:.1em}
+.dot{width:12px;height:12px;border-radius:50%}
+.on-l{color:#34d399;border:1px solid #34d39966;border-radius:99px;padding:2px 10px;font-size:11px}
+#log{height:200px;overflow:auto;padding:14px 16px;font:13px/1.7 monospace;border-top:1px solid var(--line)}
+#log .e{color:#f87171}#log .w{color:#fbbf24}#log b{color:#34d399}
+.tabs{display:flex;background:var(--card2);border-radius:16px;padding:6px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;padding:12px;border-radius:12px;font-weight:600;color:var(--mu)}
+.tabs button.on{background:var(--g);color:#fff}
+.tab{display:none}.tab.on{display:block}
+.prov{border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
+input[type=text],input[type=password],select.f,textarea{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:12px;font:inherit}
+.krow{display:flex;gap:8px;margin-bottom:8px}.muted{color:var(--mu);font-size:14px}
+.lab{display:block;margin:14px 0 6px;color:var(--mu);font-size:13px;font-weight:600}
+textarea{font-family:monospace;font-size:13px;height:130px}
+.seg{padding:10px;border-bottom:1px solid var(--line);font-size:14px}.seg small{color:var(--ac2);display:block}
+.stage{position:relative;display:none;margin-top:14px}.stage video{display:block;margin:0}
+.ov{position:absolute;left:8%;right:8%;bottom:56px;text-align:center;color:#fff;font-weight:800;font-size:20px;text-shadow:0 2px 6px #000,0 0 3px #000;pointer-events:none}
+.tools{display:flex;gap:8px;padding:0 16px 12px}.tl{background:#1c1a38;border:1px solid #3a3566;color:#b9b4e6;border-radius:10px;padding:6px 12px;font-size:13px}.tl.on{border-color:var(--ac);color:#d9c7ff}
+.ft{display:flex;gap:6px;padding:8px 14px;background:#000;font-size:13px}.ft button{background:none;border:0;color:#9a95c4;padding:7px 12px;border-radius:8px}.ft .on{background:#1c1a38;color:#fff}
+.ll{display:flex;gap:10px;margin-bottom:6px}.mu{color:#6f6a9c;flex:none}.tg{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;height:20px}
+.tg.ok{background:#064e3b;color:#34d399}.tg.warn{background:#4a3a0a;color:#fbbf24}.tg.err{background:#4c1010;color:#f87171}.tg.info{background:#1e2a4a;color:#7dd3fc}
+.rd{font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;align-self:center}.rd.ok{background:#064e3b;color:#34d399}.rd.bad{background:#4c1010;color:#f87171}
+.krow input{flex:1}.exp{border:0;background:linear-gradient(135deg,#10b981,#3b82f6);color:#fff;font-weight:800;font-size:16px;padding:14px 24px;border-radius:99px;margin-bottom:14px;box-shadow:0 8px 24px #10b98155}
+.segbox{border:1px solid var(--line);border-radius:18px;overflow:hidden}.sr{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}.sr:last-child{border:0}
+.tb{font:600 13px monospace;background:#38bdf822;color:var(--ac2);padding:6px 10px;border-radius:8px}
+.gb{border:1px solid;border-radius:99px;padding:6px 12px;font-weight:700;font-size:13px;white-space:nowrap;background:none}.gb.m{color:#60a5fa;background:#60a5fa22}.gb.f{color:#f472b6;background:#f472b622}
+.sr input{flex:1;min-width:0;background:var(--card2);border:0;color:var(--tx);border-radius:10px;padding:10px;font:inherit}.sr .x{padding:6px 10px}
+.modal{position:fixed;inset:0;background:#000a;display:none;place-items:center;z-index:50;padding:16px}.modal.on{display:grid}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;width:min(560px,100%);max-height:92vh;overflow:auto}
+.mc h3{margin:0 0 4px;font-size:22px}.sw{display:flex;gap:10px;margin:6px 0 14px}.sw i{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;outline:0}.sw i.on{border-color:var(--tx)}
+.cdrop{border:2px dashed var(--line);border-radius:18px;padding:26px;text-align:center;cursor:pointer;margin:6px 0 14px}.cdrop.has{border-color:#34d399}
+.cl{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.cl i{width:14px;height:14px;border-radius:50%}
+a{color:var(--ac2)}
+</style></head>
+<body>
+<header>
+ <div class="logo">🎧</div>
+ <div><h1>Khmer Dubber Free <span class="pill">REACT STUDIO</span></h1><div class="sub">AI Video Dubbing to Khmer · Free &amp; 100% Client-Side</div></div>
+ <div class="sp"></div>
+ <button class="btn" id="clonebtn">🎙 Clone voice</button><button class="btn" id="theme">☀ Theme</button><button class="btn" id="setbtn" title="Settings" aria-label="Settings">⚙</button>
+</header>
+
+<section class="hero">
+ <span class="badge"><i></i>AI DUBBING STUDIO · ភាសាខ្មែរ</span>
+ <h2>Dub any video into <span>Khmer</span></h2>
+ <p>Transcribe, translate, and synthesize natural Khmer voices in one click — right in your browser. Your video never leaves your device.</p>
+ <div class="chips"><span>Free-tier friendly</span><span>Natural Khmer voices</span><span>100% private</span><span>Frame-accurate export</span></div>
+</section>
+
+<main>
+<div class="panel">
+ <div class="drop" id="drop"><div class="up">⬆</div><div><b id="dn">Drop a video here or click to browse</b><small>MP4, MOV, WebM · the file never leaves your device</small></div></div>
+ <input type="file" id="file" accept="video/*" hidden>
+ <div class="stage" id="stage"><video id="vid" controls></video><div class="ov" id="ov2"></div></div>
+ <div class="row">
+  <span class="muted">🔈 Original audio</span><input type="range" id="orig" min="0" max="100" value="0"><span class="muted" id="ov">0%</span>
+  <div class="go"><button id="run" disabled>✦ Dub to Khmer</button>
+   <select id="mode"><option>Full Dub</option><option>Subtitles only</option></select></div>
+ </div>
+ <div class="bar"><div id="prog"></div></div>
+ <div class="steps"><div class="step" id="s1"><i>1</i>Transcribe</div><div class="step" id="s2"><i>2</i>Translate</div><div class="step" id="s3"><i>3</i>Khmer voice</div></div>
+ <div class="term">
+  <div class="th"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>&nbsp;SYSTEM DIAGNOSTICS<span class="sp"></span><span class="on-l">● ONLINE</span></div>
+  <div class="tools"><button class="tl on" id="auto">◉ Auto-scroll</button><button class="tl" id="lcopy">⧉ Copy</button><button class="tl" id="lclr">🗑 Clear</button></div>
+  <div class="ft"><button class="on" data-f="all">All (<span id="lc">0</span>)</button><button data-f="ai">Gemini AI</button><button data-f="voice">Voice &amp; Audio</button><button data-f="issue">Issues / Retries</button></div>
+  <div id="log"></div>
+ </div>
+</div>
+
+<div>
+ <div class="panel" id="res" style="display:none;margin-bottom:20px">
+  <b class="lab" style="margin:0 0 12px;letter-spacing:.1em">KHMER SCRIPT</b>
+  <div class="row" style="margin:0 0 12px"><button class="btn" id="bvoice">🔈 Voice</button><button class="btn" id="breplay">▶ Replay</button><button class="btn" id="dl">⬇ Audio</button><button class="btn" id="srt">⬇ .srt</button></div>
+  <button class="exp" id="exp">⟲ Export dubbed video</button>
+  <div class="segbox" id="segs"></div>
+  <p class="muted" id="vnote"></p>
+ </div>
+ <div class="panel">
+  <div class="tabs"><button class="on" data-t="t1">Providers</button><button data-t="t2">Pipeline</button><button data-t="t3">Subtitles</button></div>
+  <div class="tab on" id="t1">
+   <p class="muted">Add your Google Gemini API key below. Keys are stored locally in this browser only. Multiple keys rotate automatically when one hits a rate limit.</p>
+   <div class="prov">
+    <div class="row" style="margin:0 0 12px"><b style="font-size:18px">Gemini</b><span class="pill">transcribe · translate · voice</span><span class="sp"></span><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get free key ↗</a></div>
+    <div id="keys"></div>
+    <div class="row" style="margin:10px 0"><button class="btn" id="addk">+ Add key</button><button class="btn" id="showk">👁 Show</button><button class="btn" id="chk">✓ Check keys</button><span class="sp"></span><span class="muted" id="kc">0 key(s)</span></div>
+    <div class="row" style="margin:14px 0 8px"><b class="muted">MODELS</b><span class="sp"></span><button class="btn" id="lm">↻ Load Models</button></div>
+    <textarea id="models" readonly>Click “Load Models” to list models for your key.</textarea>
+   </div>
+  </div>
+  <div class="tab" id="t2">
+   <label class="lab">KHMER VOICE ENGINE</label>
+   <select class="f" id="eng"><option value="gemini">Gemini TTS — natural Khmer, exportable</option><option value="browser">Edge/browser voice — Sreymom / Piseth (live preview only)</option></select>
+   <label class="lab">VOICE ROUTING</label>
+   <select class="f" id="route"><option value="auto">Auto from subtitle gender (♂ Piseth / ♀ Sreymom)</option><option value="m">Piseth (male only)</option><option value="f">Sreymom (female only)</option></select>
+   <div class="row" style="margin:10px 0 0"><button class="btn" id="clonebtn2">🎙 Clone voice</button><span class="muted">Free · no tokens</span></div><div id="clist"></div>
+   <label class="lab">Text model (transcribe + translate)</label><input type="text" id="tm" list="dl-text" value="gemini-3.5-flash-lite">
+   <label class="lab">Gemini voice model</label><input type="text" id="vm" list="dl-tts" value="gemini-3.8-flash-lite-tts">
+   <label class="lab">Male / female Gemini voices</label><div class="krow"><input type="text" id="vmale" value="Charon"><input type="text" id="vfem" value="Kore"></div>
+   <label class="lab">Max speed-up to fit timing: <span id="spv">1.4</span>×</label><input type="range" id="sp" min="1" max="2" step="0.1" value="1.4" style="width:100%">
+   <p class="muted">Piseth = male, Sreymom = female. With the browser engine, voices are the Khmer ones installed in your browser (Microsoft Edge ships both) and can’t be exported.</p>
+  </div>
+  <div class="tab" id="t3">
+   <label class="lab">CUSTOM SRT SUBTITLES (OPTIONAL)</label>
+   <p class="muted">If you already have English subtitles, paste them or upload a file. Gemini will translate them directly into Khmer instead of transcribing the audio.</p>
+   <div class="row" style="margin:6px 0"><b class="muted">SRT FILE</b><span class="sp"></span><button class="btn" id="srtpick">CHOOSE FILE</button></div>
+   <input type="file" id="srtfile" accept=".srt,.txt" hidden>
+   <textarea id="srtin" style="height:300px" placeholder="1&#10;00:00:01,000 --> 00:00:04,000&#10;Hello world"></textarea>
+  </div>
+ </div>
+</div>
+</main>
+
+<div class="modal" id="pm"><div class="mc" style="width:min(380px,100%)">
+ <h3>🔒 Settings</h3><input type="password" id="pw" placeholder="Password" autocomplete="off" style="margin:14px 0 6px"><div id="pwe" class="muted" style="color:#f87171;min-height:20px"></div>
+ <div class="row" style="justify-content:flex-end;margin:8px 0 0"><button class="btn" id="pcancel">Cancel</button><button class="exp" id="pok" style="margin:0;padding:10px 22px;font-size:15px">Unlock</button></div>
+</div></div>
+<div class="modal" id="sm"><div class="mc">
+ <div class="row" style="margin:0 0 6px"><h3 style="margin:0">⚙ Settings</h3><span class="sp"></span><button class="btn" id="sclose">✕</button></div>
+ <label class="lab">API KEYS</label>
+ <div class="row" style="margin:0"><button class="btn" id="kexp">⬇ Download all API keys</button><button class="btn" id="kimp">⬆ Import API keys</button></div>
+ <label class="lab">VOICE CLONES</label>
+ <div class="row" style="margin:0"><button class="btn" id="cexp">⬇ Download clone voices</button><button class="btn" id="cimp">⬆ Import clone voices</button></div>
+ <p class="muted" style="font-size:12px">Use these to move to another device: download here, then import on the new device. Imports are merged with what you already have.</p>
+ <label class="lab">GOOGLE SHEET BACKUP</label>
+ <input type="text" id="gslink" placeholder="Google Sheet link">
+ <div class="row" style="margin:8px 0"><button class="btn" id="gsopen">↗ Open sheet</button><button class="btn" id="gscopyk">⧉ Copy keys (paste into sheet)</button></div>
+ <p class="muted" style="font-size:13px;margin:0 0 8px"><b>Load</b> reads keys straight from the link above (the sheet must be shared as “Anyone with the link – Viewer”). A browser can’t <b>save</b> to a plain Sheet link, so for one-click saving paste the Web app URL of a small Apps Script attached to the sheet (code below); otherwise use “Copy keys” and paste them into the sheet.</p>
+ <input type="text" id="gsurl" placeholder="https://script.google.com/macros/s/…/exec">
+ <input type="password" id="gssec" placeholder="Secret (same as SECRET in the script)" style="margin-top:8px">
+ <div class="row" style="margin:10px 0 0"><button class="btn" id="gssave">☁ Save keys to sheet</button><button class="btn" id="gsload">☁ Load keys from sheet</button></div>
+ <details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Apps Script code (how to set up)</summary>
+  <p class="muted" style="font-size:12px">In your sheet: Extensions → Apps Script → paste → set SECRET → Deploy → New deployment → Web app → Execute as <i>Me</i>, access <i>Anyone</i> → copy the URL.</p>
+  <textarea id="gscode" readonly style="height:170px"></textarea><button class="btn" id="gscopy" style="margin-top:6px">⧉ Copy code</button></details>
+ <input type="file" id="impf" accept=".json,application/json" hidden>
+</div></div>
+<div class="modal" id="cm"><div class="mc">
+ <h3>Create a voice clone</h3><p class="muted" style="margin:0 0 12px">Trim a sample to 15s or less. Everything is free — typing or auto-transcribing the transcript costs no tokens.</p>
+ <label class="lab">Voice name</label><input type="text" id="cname" placeholder="e.g. My Voice">
+ <label class="lab">Voice color</label><div class="sw" id="csw"></div>
+ <div class="cdrop" id="cdrop"><div style="font-size:28px">⬆</div><b id="cdt">Drop an audio file here or click to browse</b><div class="muted">Max 15s after trimming, up to 10MB</div></div>
+ <input type="file" id="cfile" accept="audio/*,video/*" hidden>
+ <div class="krow"><div style="flex:1"><label class="lab" style="margin-top:0">Start at (seconds)</label><input type="text" id="cstart" value="0"></div>
+  <div style="flex:1"><label class="lab" style="margin-top:0">Base Khmer voice</label><select class="f" id="cbase"><option>Charon</option><option>Puck</option><option>Fenrir</option><option>Kore</option><option>Zephyr</option><option>Aoede</option><option>Leda</option></select></div></div>
+ <audio id="cprev" controls style="width:100%;margin:10px 0;display:none"></audio>
+ <label class="lab">Reference transcript (optional)</label>
+ <label class="muted" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cauto"> ✨ Auto-transcribe (free)</label>
+ <textarea id="ctext" style="height:80px;margin-top:8px" placeholder="Type the exact speech spoken in the sample…"></textarea>
+ <p class="muted" style="font-size:12px">Note: Gemini TTS can’t copy a voice exactly. The sample is analysed for pitch/gender and mapped to the closest base voice, which you can change above.</p>
+ <div class="row" style="justify-content:flex-end;margin:8px 0 0"><button class="btn" id="ccancel">Cancel</button><button class="exp" id="cok" style="margin:0;padding:10px 22px;font-size:15px">Create voice</button></div>
+</div></div>
+<datalist id="dl-text"></datalist><datalist id="dl-tts"></datalist>
+<script>
+const $=s=>document.querySelector(s);
+let file=null,segs=[],buffers=[],ctx=null,srcs=[],timers=[],dur=0,showKeys=false,exporting=null,logs=[],filt='all',auto=true,kst=[],ki=0;
+const v=$('#vid');
+const TAG={ok:'SUCCESS',info:'INFO',warn:'WARN',err:'ERROR'};
+function log(m,cat='ai',lvl='info'){logs.push({t:new Date().toLocaleTimeString(),m,cat,lvl});drawLog()}
+function drawLog(){const l=$('#log');const a=logs.filter(x=>filt==='all'||(filt==='issue'?(x.lvl==='warn'||x.lvl==='err'):x.cat===filt));
+ l.innerHTML=a.map(x=>`<div class="ll"><span class="mu">${x.t}</span><span class="tg ${x.lvl}">${TAG[x.lvl]}</span><span>${x.m}</span></div>`).join('');
+ if(auto)l.scrollTop=1e9;$('#lc').textContent=logs.length}
+log('Ready. Audio pipeline and API rotation active.','ai','ok');
+document.querySelectorAll('.ft button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ft button').forEach(x=>x.classList.remove('on'));b.classList.add('on');filt=b.dataset.f;drawLog()});
+$('#auto').onclick=e=>{auto=!auto;e.currentTarget.classList.toggle('on',auto)};
+$('#lclr').onclick=()=>{logs=[];drawLog()};
+$('#lcopy').onclick=()=>{try{navigator.clipboard.writeText(logs.map(x=>`${x.t} ${TAG[x.lvl]} ${x.m.replace(/<[^>]+>/g,'')}`).join('\n'))}catch(e){}};
+$('#theme').onclick=()=>document.documentElement.classList.toggle('light');
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
+/* keys */
+let keys=[];try{keys=JSON.parse(localStorage.getItem('kd_keys')||'[]')}catch(e){}
+if(!keys.length)keys=[''];
+function drawKeys(){const k=$('#keys');k.innerHTML='';keys.forEach((val,i)=>{const r=document.createElement('div');r.className='krow';
+ r.innerHTML=`<input type="${showKeys?'text':'password'}" placeholder="AIzaSy… paste Gemini key"><span class="rd ${kst[i]||''}">${kst[i]==='ok'?'Ready':kst[i]==='bad'?'Invalid':''}</span><button class="btn">✕</button>`;
+ r.children[0].value=val;r.children[0].oninput=e=>{keys[i]=e.target.value.trim();kst[i]='';saveKeys()};
+ r.children[2].onclick=()=>{keys.splice(i,1);kst.splice(i,1);if(!keys.length)keys=[''];drawKeys()};k.appendChild(r)});saveKeys()}
+function saveKeys(){try{localStorage.setItem('kd_keys',JSON.stringify(keys))}catch(e){}$('#kc').textContent=keys.filter(Boolean).length+' key(s)'}
+$('#addk').onclick=()=>{keys.push('');drawKeys()};
+$('#showk').onclick=()=>{showKeys=!showKeys;$('#showk').textContent=showKeys?'🙈 Hide':'👁 Show';drawKeys()};
+drawKeys();
+const valid=()=>keys.filter(Boolean);
+const sleep=t=>new Promise(r=>setTimeout(r,t));
+async function gem(path,body,method='POST'){
+ const ks=valid();if(!ks.length)throw new Error('No API key. Add a Gemini key in Providers.');
+ let last;
+ for(let t=0;t<ks.length*2;t++){
+  const key=ks[ki%ks.length];
+  try{
+   const r=await fetch('https://generativelanguage.googleapis.com/v1beta/'+path,{method,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:body?JSON.stringify(body):undefined});
+   if(r.ok)return await r.json();
+   const j=await r.json().catch(()=>({}));last=new Error((j.error&&j.error.message)||r.status);last.fatal=![429,403,500,503].includes(r.status)||(/per ?day/i.test(last.message)&&ks.length===1);
+   if(last.fatal)throw last;
+   log(`Key #${ki%ks.length+1} failed (${r.status}). Rotating…`,'ai','warn');ki++;await sleep(300);
+  }catch(e){if(e.fatal)throw e;last=e;ki++;log('Network error: '+e.message,'ai','warn');await sleep(300)}
+ }
+ throw last;
+}
+$('#chk').onclick=async()=>{const ks=keys;for(let i=0;i<ks.length;i++){if(!ks[i])continue;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',{headers:{'x-goog-api-key':ks[i]}});kst[i]=r.ok?'ok':'bad';log(`Key #${i+1}: ${r.ok?'OK':'invalid ('+r.status+')'}`,'ai',r.ok?'ok':'err')}catch(e){kst[i]='bad';log(`Key #${i+1}: ${e.message}`,'ai','err')}}drawKeys();await syncKeys(ks.filter((k,i)=>k&&kst[i]==='ok'))};
+$('#lm').onclick=async()=>{try{ki=0;const j=await gem('models?pageSize=100',null,'GET');const ns=j.models.filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));$('#models').value=ns.join('\n');$('#dl-text').innerHTML=ns.filter(x=>!/tts|image|embed|live|native-audio|lyria|robotics/.test(x)).map(x=>`<option value="${x}">`).join('');$('#dl-tts').innerHTML=ns.filter(x=>/tts/.test(x)).map(x=>`<option value="${x}">`).join('');log('Models loaded.','ai','ok')}catch(e){log('Load models failed: '+e.message,'ai','err')}};
+/* upload */
+const drop=$('#drop');
+drop.onclick=()=>$('#file').click();
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+$('#file').onchange=e=>setFile(e.target.files[0]);
+function setFile(f){if(!f)return;file=f;v.src=URL.createObjectURL(f);$('#stage').style.display='block';v.volume=0;$('#run').disabled=false;$('#dn').textContent='✓ '+f.name+' · click to change';log(`Loaded <b>${f.name}</b> (${(f.size/1048576).toFixed(1)} MB)`,'voice','ok')}
+$('#orig').oninput=e=>{$('#ov').textContent=e.target.value+'%';v.volume=e.target.value/100};
+$('#sp').oninput=e=>$('#spv').textContent=e.target.value;
+$('#srtpick').onclick=()=>$('#srtfile').click();
+$('#srtfile').onchange=async e=>{const f=e.target.files[0];if(f){$('#srtin').value=await f.text();log('SRT loaded: '+f.name,'ai','ok')}};
+/* helpers */
+const step=n=>{for(let i=1;i<=3;i++)$('#s'+i).className='step'+(i<n?' ok':i==n?' on':'')};
+const prog=p=>$('#prog').style.width=p+'%';
+const mmss=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');
+const fmt=t=>{const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=(t%60).toFixed(3).padStart(6,'0').replace('.',',');return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${s}`};
+function b64(buf){let s='';const u=new Uint8Array(buf);for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)}
+function wav(ch,sr){const n=ch.length,b=new ArrayBuffer(44+n*2),d=new DataView(b);const w=(o,s)=>[...s].forEach((c,i)=>d.setUint8(o+i,c.charCodeAt(0)));
+ w(0,'RIFF');d.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);d.setUint32(24,sr,true);d.setUint32(28,sr*2,true);d.setUint16(32,2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*2,true);
+ for(let i=0;i<n;i++)d.setInt16(44+i*2,Math.max(-1,Math.min(1,ch[i]))*32767,true);return b}
+const getCtx=()=>ctx||(ctx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:24000}));
+async function extractAudio(f){
+ const ac=new (window.AudioContext||window.webkitAudioContext)();
+ const dec=await ac.decodeAudioData(await f.arrayBuffer());
+ const off=new OfflineAudioContext(1,Math.ceil(dec.duration*16000),16000);const s=off.createBufferSource();s.buffer=dec;s.connect(off.destination);s.start();
+ return wav((await off.startRendering()).getChannelData(0),16000)}
+const ts=s=>{const m=s.match(/(\d+):(\d+):(\d+)[,.](\d+)/);return m?+m[1]*3600+ +m[2]*60+ +m[3]+ +('0.'+m[4]):0};
+function parseSrt(t){return t.replace(/\\n/g,'\n').replace(/\r/g,'').split(/\n\s*\n/).map(b=>{const l=b.trim().split('\n');const i=l.findIndex(x=>x.includes('-->'));if(i<0)return null;const [a,c]=l[i].split('-->');return{start:ts(a),end:ts(c),text:l.slice(i+1).join(' ')}}).filter(Boolean)}
+const gOf=s=>{if(s.v&&(s.v[0]!=='c'||clones.some(x=>'c:'+x.id===s.v)))return s.v;const r=$('#route').value;return r==='auto'?s.g:r};
+const cl=s=>{const r=gOf(s);return r[0]==='c'?clones.find(x=>'c:'+x.id===r):null};
+const gs=s=>{const c=cl(s);return c?c.g:gOf(s)};
+const lbl=s=>{const c=cl(s);return c?c.name:gOf(s)==='m'?'Piseth':'Sreymom'};
+const norm=a=>a.filter(s=>s.text&&s.end>s.start).map(s=>({start:+s.start,end:+s.end,text:String(s.text),g:/^f/i.test(s.gender||'')?'f':'m'}));
+
+/* voice clones */
+let clones=[];try{clones=JSON.parse(localStorage.getItem('kd_clones')||'[]')}catch(e){}
+const COL=['#059669','#e9b062','#f27a93','#a970f7','#7fb0e0','#c264fa','#98989e'];let ccol=COL[0],cwav=null,cg='m';
+const saveClones=()=>{try{localStorage.setItem('kd_clones',JSON.stringify(clones))}catch(e){log('Could not save clone (storage full).','voice','warn')}};
+function drawClones(){const rt=$('#route');[...rt.querySelectorAll('[data-c]')].forEach(o=>o.remove());
+ clones.forEach(c=>{const o=document.createElement('option');o.value='c:'+c.id;o.dataset.c=1;o.textContent='🎙 '+c.name+' (clone)';rt.appendChild(o)});
+ $('#clist').innerHTML='';clones.forEach(c=>{const d=document.createElement('div');d.className='cl';d.innerHTML=`<i style="background:${c.color}"></i><b></b><span class="muted">${c.g==='m'?'♂':'♀'} → ${c.base}</span><span class="sp"></span><button class="btn">✕</button>`;
+  d.children[1].textContent=c.name;d.children[4].onclick=()=>{clones=clones.filter(x=>x!==c);saveClones();drawClones()};$('#clist').appendChild(d)})}
+$('#csw').innerHTML=COL.map((c,i)=>`<i style="background:${c}" class="${i?'':'on'}" data-c="${c}"></i>`).join('');
+$('#csw').onclick=e=>{if(!e.target.dataset.c)return;ccol=e.target.dataset.c;[...$('#csw').children].forEach(x=>x.classList.toggle('on',x===e.target))};
+const openClone=()=>{cwav=null;$('#cname').value='';$('#ctext').value='';$('#cdt').textContent='Drop an audio file here or click to browse';$('#cdrop').classList.remove('has');$('#cprev').style.display='none';$('#cm').classList.add('on')};
+$('#clonebtn').onclick=$('#clonebtn2').onclick=openClone;$('#ccancel').onclick=()=>$('#cm').classList.remove('on');
+$('#cdrop').onclick=()=>$('#cfile').click();
+let cfileObj=null;
+async function loadSample(){if(!cfileObj)return;
+ if(cfileObj.size>10485760)return log('Sample is over 10MB.','voice','err');
+ try{const ac=new (window.AudioContext||window.webkitAudioContext)();const dec=await ac.decodeAudioData(await cfileObj.arrayBuffer());
+  const st=Math.min(Math.max(0,parseFloat($('#cstart').value)||0),Math.max(0,dec.duration-0.5)),len=Math.min(15,dec.duration-st);
+  const off=new OfflineAudioContext(1,Math.ceil(len*16000),16000),src=off.createBufferSource();src.buffer=dec;src.connect(off.destination);src.start(0,st,len);
+  const r=(await off.startRendering()).getChannelData(0);cwav=wav(r,16000);
+  cg=f0(r)>165?'f':'m';$('#cbase').value=cg==='f'?$('#vfem').value:$('#vmale').value;
+  const pv=$('#cprev');pv.src=URL.createObjectURL(new Blob([cwav],{type:'audio/wav'}));pv.style.display='block';
+  $('#cdt').textContent='✓ '+cfileObj.name+` · ${len.toFixed(1)}s (${cg==='f'?'female':'male'}-like voice)`;$('#cdrop').classList.add('has')
+ }catch(e){log('Could not read sample: '+e.message,'voice','err')}}
+function f0(x){const sr=16000,fr=1024,a=[];for(let o=0;o+fr*2<x.length;o+=4000){let e=0;for(let i=0;i<fr;i++)e+=x[o+i]**2;if(e/fr<1e-4)continue;
+ let best=0,bl=0;for(let l=40;l<=400;l+=2){let c=0;for(let i=0;i<fr;i++)c+=x[o+i]*x[o+i+l];if(c>best){best=c;bl=l}}if(bl&&best>0.3*e)a.push(sr/bl)}
+ a.sort((p,q)=>p-q);return a.length?a[a.length>>1]:120}
+$('#cfile').onchange=e=>{cfileObj=e.target.files[0];loadSample()};$('#cstart').onchange=loadSample;
+$('#cok').onclick=async()=>{const name=$('#cname').value.trim();if(!name)return $('#cname').focus();if(!cwav)return log('Add an audio sample first.','voice','warn');
+ let text=$('#ctext').value.trim();const b=$('#cok');b.disabled=true;
+ try{if(!text&&$('#cauto').checked){ki=0;const r=await gm('text',{contents:[{parts:[{inline_data:{mime_type:'audio/wav',data:b64(cwav)}},{text:'Transcribe this speech exactly. Return only the transcript.'}]}],generationConfig:{}});text=r.candidates[0].content.parts.map(p=>p.text||'').join('').trim()}}
+ catch(e){log('Auto-transcribe failed: '+e.message,'ai','warn')}
+ clones.push({id:Date.now().toString(36),name,color:ccol,g:cg,base:$('#cbase').value,text,wav:b64(cwav)});saveClones();drawClones();
+ log(`Voice clone <b>${name}</b> created → base voice ${$('#cbase').value}. Select it in Pipeline → Voice routing.`,'voice','ok');
+ $('#route').value='c:'+clones[clones.length-1].id;$('#cm').classList.remove('on');b.disabled=false};
+drawClones();
+
+/* settings (password gate, backup, sheet sync) */
+async function syncKeys(list){if(!list.length)return;const u=(($('#gsurl')||{}).value||'').trim();
+ if(!u)return log('Keys not synced to Google: add the Apps Script URL in ⚙ Settings.','ai','warn');
+ try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({secret:$('#gssec').value,keys:list})});}catch(e){log('Google sync failed: '+e.message,'ai','err')}}
+let unlocked=false,impKind='';
+const SHEET_CODE=`const SECRET='change-me';
+function doPost(e){const d=JSON.parse(e.postData.contents);
+ if(d.secret!==SECRET)return ContentService.createTextOutput('denied');
+ const sh=SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+ if(sh.getLastRow()<1)sh.appendRow(['#','API key','updated']);
+ const have=sh.getDataRange().getValues().map(r=>r[1]);
+ d.keys.forEach(k=>{if(have.indexOf(k)<0)sh.appendRow([sh.getLastRow(),k,new Date()])});
+ return ContentService.createTextOutput('ok')}
+function doGet(e){if(e.parameter.secret!==SECRET)return ContentService.createTextOutput('denied');
+ const v=SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].getDataRange().getValues().slice(1).map(r=>r[1]).filter(String);
+ return ContentService.createTextOutput(JSON.stringify(v)).setMimeType(ContentService.MimeType.JSON)}`;
+$('#gscode').value=SHEET_CODE;
+$('#gscopy').onclick=()=>{try{navigator.clipboard.writeText(SHEET_CODE)}catch(e){$('#gscode').select()}};
+const DEFAULT_SHEET='https://docs.google.com/spreadsheets/d/1CkYZI0OGf5BCeI_TXbAwUK51t9iMVelvrFa7xInTr1o/edit?usp=sharing';
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbxuBgYTd4IhUS_9cFv6oDoOgpqt8WRA8bPtk9A4PT98v9KsCy2iiMVZ1THYGV0iN3mM/exec',DEFAULT_SECRET='1092001';
+$('#gslink').value=DEFAULT_SHEET;$('#gsurl').value=DEFAULT_URL;$('#gssec').value=DEFAULT_SECRET;
+try{const g=JSON.parse(localStorage.getItem('kd_sheet')||'{}');if(g.u)$('#gsurl').value=g.u;if(g.s)$('#gssec').value=g.s;if(g.l)$('#gslink').value=g.l}catch(e){}
+$('#gsopen').onclick=()=>window.open($('#gslink').value.trim()||DEFAULT_SHEET,'_blank','noopener');
+$('#gscopyk').onclick=()=>{const k=keys.filter(Boolean);if(!k.length)return log('No API keys to copy.','ai','warn');try{navigator.clipboard.writeText(k.join('\n'));log(`Copied ${k.length} key(s). Paste them into the sheet (column B).`,'ai','ok')}catch(e){log('Clipboard blocked by the browser.','ai','err')}};
+async function loadDirect(){const m=$('#gslink').value.match(/\/d\/([\w-]+)/);if(!m)return log('Invalid Google Sheet link.','ai','err');
+ try{const r=await fetch(`https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv`);if(!r.ok)throw new Error('HTTP '+r.status+' — set sharing to “Anyone with the link – Viewer”');
+  const a=[...new Set((await r.text()).match(/AIza[\w-]{30,}/g)||[])],have=new Set(keys);let n=0;a.forEach(k=>{if(!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();
+  if(!a.length)log('No API keys (AIza…) found in the sheet yet.','ai','warn')
+ }catch(e){log('Sheet load failed: '+e.message+'. If sharing is correct, your browser may be blocking the request; use the Apps Script URL instead.','ai','err')}}
+const saveSheet=()=>{try{localStorage.setItem('kd_sheet',JSON.stringify({u:$('#gsurl').value.trim(),s:$('#gssec').value,l:$('#gslink').value.trim()}))}catch(e){}};
+$('#gsurl').oninput=$('#gssec').oninput=$('#gslink').oninput=saveSheet;
+$('#setbtn').onclick=()=>{if(unlocked)return $('#sm').classList.add('on');$('#pw').value='';$('#pwe').textContent='';$('#pm').classList.add('on');setTimeout(()=>$('#pw').focus(),50)};
+const tryPw=()=>{if(btoa($('#pw').value)==='MTA5MjAwMQ=='){unlocked=true;$('#pm').classList.remove('on');$('#sm').classList.add('on')}else{$('#pwe').textContent='Wrong password.';$('#pw').value=''}};
+$('#pok').onclick=tryPw;$('#pw').onkeydown=e=>{if(e.key==='Enter')tryPw()};
+$('#pcancel').onclick=()=>$('#pm').classList.remove('on');$('#sclose').onclick=()=>$('#sm').classList.remove('on');
+$('#kexp').onclick=()=>{const k=keys.filter(Boolean);if(!k.length)return log('No API keys to download.','ai','warn');save(new Blob([JSON.stringify({type:'kd-keys',keys:k},null,1)],{type:'application/json'}),'khmer-dubber-api-keys.json');log(`Downloaded ${k.length} API key(s).`,'ai','ok')};
+$('#cexp').onclick=()=>{if(!clones.length)return log('No clone voices to download.','voice','warn');save(new Blob([JSON.stringify({type:'kd-clones',clones})],{type:'application/json'}),'khmer-dubber-clone-voices.json');log(`Downloaded ${clones.length} clone voice(s).`,'voice','ok')};
+$('#kimp').onclick=()=>{impKind='kd-keys';$('#impf').click()};$('#cimp').onclick=()=>{impKind='kd-clones';$('#impf').click()};
+$('#impf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{const j=JSON.parse(await f.text());if(j.type!==impKind)throw new Error('This is not a '+(impKind==='kd-keys'?'API keys':'clone voices')+' file.');
+  if(impKind==='kd-keys'){const have=new Set(keys);let n=0;(j.keys||[]).forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();log(`Imported ${n} new API key(s).`,'ai','ok')}
+  else{const ids=new Set(clones.map(c=>c.id));let n=0;(j.clones||[]).forEach(c=>{if(c&&c.id&&!ids.has(c.id)){clones.push(c);n++}});saveClones();drawClones();log(`Imported ${n} new clone voice(s).`,'voice','ok')}
+ }catch(err){log('Import failed: '+err.message,'ai','err')}};
+$('#gssave').onclick=async()=>{const u=$('#gsurl').value.trim(),k=keys.filter(Boolean);if(!u)return log('Saving needs the Apps Script Web app URL (setup code below). Or press “Copy keys” and paste them into the sheet.','ai','warn');if(!k.length)return log('No API keys to save.','ai','warn');
+ try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({secret:$('#gssec').value,keys:k})});log(`Sent ${k.length} key(s) to your Google Sheet. Open the sheet to confirm.`,'ai','ok')}catch(e){log('Sheet save failed: '+e.message,'ai','err')}};
+$('#gsload').onclick=async()=>{const u=$('#gsurl').value.trim();if(!u)return loadDirect();
+ try{const r=await fetch(u+(u.includes('?')?'&':'?')+'secret='+encodeURIComponent($('#gssec').value));const t=await r.text();if(t==='denied')throw new Error('Wrong secret.');
+  const a=JSON.parse(t),have=new Set(keys);let n=0;a.forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();}catch(e){log('Sheet load failed: '+e.message,'ai','err')}};
+/* model fallback */
+async function gm(kind,body){const inp=$(kind==='tts'?'#vm':'#tm');
+ const fb=kind==='tts'?['gemini-3.8-flash-lite-tts','gemini-3.8-flash-tts','gemini-3.1-flash-tts-preview','gemini-2.5-flash-preview-tts','gemini-2.5-pro-preview-tts']:['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-3.8-flash','gemini-flash-latest'];
+ for(const m of [inp.value,...fb.filter(x=>x!==inp.value)]){
+  try{if(kind==='text')body.generationConfig.thinkingConfig={thinkingLevel:'minimal'};let r;try{r=await gem(`models/${m}:generateContent`,body)}catch(e){if(/think/i.test(e.message)&&body.generationConfig.thinkingConfig){delete body.generationConfig.thinkingConfig;r=await gem(`models/${m}:generateContent`,body)}else throw e}if(m!==inp.value){inp.value=m;log(`Switched to model <b>${m}</b>.`,'ai','ok')}return r}
+  catch(e){if(!/no longer available|not found|not supported|404|deprecated|quota|exceeded|exhausted/i.test(e.message))throw e;log(`Model ${m} unavailable, trying next…`,'ai','warn')}}
+ throw new Error('No working model found. Pick one in the Pipeline tab (use Load Models to see yours).')}
+/* pipeline */
+$('#run').onclick=async()=>{
+ const b=$('#run');b.disabled=true;ki=0;segs=[];buffers=[];prog(0);stopAll();
+ try{
+  const custom=$('#srtin').value.trim();dur=v.duration||0;let out;
+  const tm=`models/${$('#tm').value}:generateContent`,gen={responseMimeType:'application/json'};
+  const ask='Return ONLY a JSON array: [{"start":seconds,"end":seconds,"text":"natural spoken Khmer (ភាសាខ្មែរ)","gender":"male or female (speaker gender, inferred from voice/context)"}].';
+  if(custom){
+   step(1);const p=parseSrt(custom);if(!p.length)throw new Error('Could not parse the SRT subtitles.');log(`Using custom SRT (${p.length} cues).`,'ai','ok');prog(15);step(2);
+   log('Translating subtitles to Khmer…');
+   out=await gm("text",{contents:[{parts:[{text:'Translate these subtitle cues into Khmer, keeping the same count and timings. '+ask+'\n'+JSON.stringify(p)}]}],generationConfig:gen});
+  }else{
+   step(1);log('Extracting audio in browser…','voice');const wb=await extractAudio(file);log(`Audio ready: ${dur.toFixed(1)}s`,'voice','ok');prog(10);
+   log('Transcribing & translating with Gemini…');
+   out=await gm("text",{contents:[{parts:[{inline_data:{mime_type:'audio/wav',data:b64(wb)}},{text:'Transcribe the speech in this audio and translate it into Khmer with accurate timestamps. '+ask+` Audio length ${dur.toFixed(1)}s.`}]}],generationConfig:gen});
+   step(2);
+  }
+  segs=norm(JSON.parse(out.candidates[0].content.parts.map(p=>p.text||'').join('').replace(/```json|```/g,'')));
+  log(`<b>${segs.length}</b> Khmer segments ready.`,'ai','ok');prog(40);renderSegs();
+  if($('#mode').value==='Subtitles only'){step(4);prog(100)}else await makeVoices();
+ }catch(e){log('Error: '+e.message,'ai','err');console.error(e)}
+ b.disabled=false};
+const vname=s=>cl(s)?cl(s).base:gOf(s)==='m'?$('#vmale').value:$('#vfem').value;
+/* remove the noisy burst Gemini TTS sometimes adds at the end of a clip */
+function fixBuf(ab,c){const d=ab.getChannelData(0).slice(),sr=ab.sampleRate,W=Math.round(sr*.01),n=Math.floor(d.length/W),act=[];
+ for(let k=0;k<n;k++){let e=0;for(let q=0;q<W;q++)e+=d[k*W+q]**2;act.push(Math.sqrt(e/W)>=.003)}
+ const runs=[];for(let k=0;k<n;){if(act[k]){let j=k;while(j<n&&act[j])j++;if(runs.length&&k-runs[runs.length-1][1]<5)runs[runs.length-1][1]=j;else runs.push([k,j]);k=j}else k++}
+ runs.forEach(([a,b],i)=>{let zc=0,pk=0;for(let t=a*W+1;t<b*W;t++){if((d[t]>=0)!==(d[t-1]>=0))zc++;pk=Math.max(pk,Math.abs(d[t]))}
+  zc/=(b-a)*W;const ln=(b-a)*W/sr,gb=i?(a-runs[i-1][1])*W/sr:9,ga=i<runs.length-1?(runs[i+1][0]-b)*W/sr:9;
+  if(ln<.4&&zc>.1&&pk>.9&&gb>=.1&&ga>=.1){d.fill(0,Math.max(0,a-1)*W,(b+1)*W);log('Removed a noisy burst at the end of a clip.','voice','info')}});
+ let end=d.length;while(end>0&&Math.abs(d[end-1])<.002)end--;end=Math.min(d.length,end+Math.round(sr*.05));
+ const f=Math.round(sr*.015);for(let k=0;k<f&&end-1-k>=0;k++)d[end-1-k]*=k/f;
+ const o=c.createBuffer(1,Math.max(1,end),sr);o.getChannelData(0).set(d.subarray(0,end));return o}
+function splitBuf(ab,idx,c){
+ if(idx.length===1){buffers[idx[0]]=fixBuf(ab,c);return}
+ const d=ab.getChannelData(0),sr=24000,w=Math.round(sr*.02),tot=idx.reduce((a,i)=>a+segs[i].text.length,0);
+ let cum=0;const cuts=[0];
+ for(let k=0;k<idx.length-1;k++){cum+=segs[idx[k]].text.length;const c0=Math.round(cum/tot*d.length);let best=c0,be=1e9;
+  for(let p=Math.max(cuts[k]+w,c0-sr/2|0);p<Math.min(d.length-w,c0+sr/2);p+=w>>1){let e=0;for(let q=0;q<w;q++)e+=d[p+q]**2;if(e<be){be=e;best=p+(w>>1)}}
+  cuts.push(best)}
+ cuts.push(d.length);
+ idx.forEach((i,k)=>{const b=c.createBuffer(1,Math.max(1,cuts[k+1]-cuts[k]),sr);b.getChannelData(0).set(d.subarray(cuts[k],cuts[k+1]));buffers[i]=fixBuf(b,c)})}
+async function voiceGroup(idx,name){const c=getCtx();
+ try{
+  const r=await gm('tts',{contents:[{parts:[{text:idx.map(i=>segs[i].text).join('\n')}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:name}}}}});
+  const raw=Uint8Array.from(atob(r.candidates[0].content.parts.find(p=>p.inlineData).inlineData.data),x=>x.charCodeAt(0));const pcm=new Int16Array(raw.buffer,0,raw.length>>1);
+  const ab=c.createBuffer(1,pcm.length,24000),ch=ab.getChannelData(0);for(let k=0;k<pcm.length;k++)ch[k]=pcm[k]/32768;
+  splitBuf(ab,idx,c);log(`Voiced ${idx.length} line(s) in <b>1 request</b> · ${lbl(segs[idx[0]])} · ${ab.duration.toFixed(1)}s`,'voice','ok');
+ }catch(e){log(`Voice failed: ${e.message.slice(0,300)}`,'voice','err')}}
+const voiceOne=i=>voiceGroup([i],vname(segs[i]));
+async function makeVoices(){
+ step(3);buffers=[];$('#vnote').textContent='';
+ if($('#eng').value==='browser'){const n=speechSynthesis.getVoices().filter(x=>x.lang.startsWith('km')).length;
+  log(n?`Browser Khmer voices found: ${n}. Press play on the video.`:'No Khmer voice installed in this browser (try Microsoft Edge).','voice',n?'ok':'warn');step(4);prog(100);return}
+ const c=getCtx();
+ const groups={};segs.forEach((s,i)=>{const n=vname(s);(groups[n]=groups[n]||[]).push(i)});let done=0;const gk=Object.keys(groups);
+ await Promise.all(gk.map(async n=>{await voiceGroup(groups[n],n);prog(40+60*(++done)/gk.length)}));
+ const n=buffers.filter(Boolean).length,adj=segs.filter((s,i)=>buffers[i]&&buffers[i].duration>s.end-s.start).length;
+ log(`Timeline fit: ${n} clips scheduled, ${adj} adjusted to match video timing.`,'voice','ok');
+ if(!n)$('#vnote').textContent='(no voice audio generated — check the diagnostics, then press 🔈 Voice to retry)';
+ step(4);prog(100)}
+/* script panel */
+function renderSegs(){$('#res').style.display='block';const box=$('#segs');box.innerHTML='';
+ segs.forEach((s,i)=>{const r=document.createElement('div');r.className='sr';
+  r.innerHTML='<span class="tb"></span><button class="gb"></button><input><button class="btn x">✕</button>';
+  const [tb,gb,inp,x]=r.children;tb.textContent=mmss(s.start);inp.value=s.text;inp.oninput=()=>s.text=inp.value;
+  const sg=()=>{const c=cl(s);gb.className='gb '+(c?'cv':gs(s));gb.style.cssText=c?`color:${c.color};background:${c.color}22`:'';gb.textContent=c?'🎙 '+c.name:gs(s)==='m'?'♂ Piseth':'♀ Sreymom';gb.title='Click to switch voice'};sg();
+  gb.onclick=()=>{const list=['m','f',...clones.map(c=>'c:'+c.id)];s.v=list[(list.indexOf(gOf(s))+1)%list.length];sg();if(buffers.length&&$('#eng').value==='gemini'){buffers[i]=null;voiceOne(i)}};
+  x.onclick=()=>{segs.splice(i,1);buffers.splice(i,1);renderSegs()};box.appendChild(r)})}
+$('#bvoice').onclick=()=>makeVoices().catch(e=>log('Voice error: '+e.message,'voice','err'));
+$('#breplay').onclick=()=>{v.currentTime=0;v.play()};
+const save=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()};
+$('#srt').onclick=()=>save(new Blob([segs.map((s,i)=>`${i+1}\n${fmt(s.start)} --> ${fmt(s.end)}\n${s.text}\n`).join('\n')],{type:'text/plain'}),'khmer.srt');
+/* playback */
+const rate=i=>Math.min(parseFloat($('#sp').value),Math.max(1,buffers[i].duration/(segs[i].end-segs[i].start)));
+function stopAll(){srcs.forEach(s=>{try{s.stop()}catch(e){}});srcs=[];timers.forEach(clearTimeout);timers=[];try{speechSynthesis.cancel()}catch(e){}}
+function speak(s){const u=new SpeechSynthesisUtterance(s.text),vs=speechSynthesis.getVoices().filter(x=>x.lang.startsWith('km'));
+ const pick=vs.find(x=>x.name.includes(gs(s)==='m'?'Piseth':'Sreymom'))||vs[0];if(pick)u.voice=pick;u.lang='km-KH';speechSynthesis.speak(u)}
+function playDub(){stopAll();const cur=v.currentTime;
+ if($('#eng').value==='browser'){segs.forEach(s=>{if(s.end>cur)timers.push(setTimeout(()=>speak(s),Math.max(0,(s.start-cur)*1000)))});return}
+ if(!buffers.length)return;const c=getCtx();c.resume();const now=c.currentTime;
+ segs.forEach((s,i)=>{if(!buffers[i]||s.end<=cur)return;const src=c.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=rate(i);src.connect(c.destination);if(exporting)src.connect(exporting);
+  const d=s.start-cur;if(d>=0)src.start(now+d);else src.start(now,-d*src.playbackRate.value);srcs.push(src)})}
+v.addEventListener('play',playDub);v.addEventListener('pause',stopAll);v.addEventListener('seeked',()=>{if(!v.paused)playDub()});
+v.addEventListener('timeupdate',()=>{const t=v.currentTime,s=segs.find(s=>t>=s.start&&t<s.end);$('#ov2').textContent=s?s.text:''});
+/* exports */
+$('#dl').onclick=async()=>{if(!buffers.some(Boolean))return log('No generated voice audio to export (Gemini engine required).','voice','warn');
+ const sr=24000,off=new OfflineAudioContext(1,Math.ceil((dur||v.duration)*sr),sr);
+ segs.forEach((s,i)=>{if(!buffers[i])return;const src=off.createBufferSource();src.buffer=buffers[i];src.playbackRate.value=rate(i);src.connect(off.destination);src.start(s.start)});
+ save(new Blob([wav((await off.startRendering()).getChannelData(0),sr)],{type:'audio/wav'}),'khmer-dub.wav');log('Exported khmer-dub.wav','voice','ok')};
+$('#exp').onclick=()=>{
+ if(!buffers.some(Boolean))return log('Export needs generated Gemini voice audio.','voice','warn');
+ const c=getCtx();c.resume();const dest=c.createMediaStreamDestination();exporting=dest;
+ v.pause();v.currentTime=0;v.volume=0;
+ const ms=new MediaStream([...v.captureStream().getVideoTracks(),...dest.stream.getAudioTracks()]);
+ const rec=new MediaRecorder(ms),ch=[];rec.ondataavailable=e=>ch.push(e.data);
+ rec.onstop=()=>{exporting=null;save(new Blob(ch,{type:'video/webm'}),'dubbed-khmer.webm');log('Exported dubbed-khmer.webm','voice','ok')};
+ v.addEventListener('ended',()=>setTimeout(()=>rec.stop(),400),{once:true});
+ rec.start();log('Recording dubbed video in real time… keep this tab open.','voice');v.play()};
+</script>
+</body></html>

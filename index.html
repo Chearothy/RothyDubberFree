@@ -156,6 +156,15 @@ main{padding-bottom:max(48px,env(safe-area-inset-bottom))}
 .tokline small{display:block;margin-top:4px;font-size:12.5px}
 .kinfo{font-size:12.5px;color:var(--mu);margin:-4px 2px 12px;line-height:1.6}.kw{color:#fbbf24;font-weight:700}.kok{color:#34d399;font-weight:700}
 .edgehelp{margin:8px 0;font-size:13px;color:var(--mu)}.edgehelp summary{cursor:pointer;font-weight:700;color:var(--tx);min-height:36px;display:flex;align-items:center}.edgehelp textarea{width:100%;margin:8px 0}
+.srtdrop{border:2px dashed var(--line);border-radius:16px;padding:clamp(14px,3vw,24px);text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:4px;margin:6px 0 10px;transition:.15s}
+.srtdrop:hover,.srtdrop.over{border-color:#7c5cff;background:#7c5cff14}
+#clist{max-height:min(46vh,360px);overflow:auto;-webkit-overflow-scrolling:touch}
+.cl{flex-wrap:wrap}.cl .btn{padding:6px 12px;min-width:40px}
+#sm .mc{width:min(640px,100%)}
+@media(hover:none){.cl .btn{min-height:44px;min-width:44px}}
+@media(max-width:560px){#addk,#showk,#chk,#morek{flex:1 1 calc(50% - 8px)}#sm #kexp,#sm #kimp,#sm #cexp,#sm #cimp,#sm #ktot,#sm #kreset{flex:1 1 100%}#intl,#txt2srt{flex:1 1 100%}}
+@media(min-width:561px) and (max-width:1100px){#intl,#txt2srt{flex:0 1 auto}}
+#kstatus .kinfo{margin:0 0 8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);font-size:13px}
 </style></head>
 <body>
 <header>
@@ -212,10 +221,9 @@ main{padding-bottom:max(48px,env(safe-area-inset-bottom))}
    <div class="prov">
     <div class="row" style="margin:0 0 12px"><b style="font-size:18px">Gemini</b><span class="pill">transcribe · translate · voice</span><span class="sp"></span><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get free key ↗</a></div>
     <div id="keys"></div>
-    <div class="row" style="margin:10px 0"><button class="btn" id="addk">+ Add key</button><button class="btn" id="showk">👁 Show</button><button class="btn" id="chk">✓ Check keys</button><button class="btn" id="ktot" title="Add up the tokens used by all your keys">🔢 My tokens</button><button class="btn" id="kreset" title="Try skipped keys again now">↺ Retry skipped</button><span class="sp"></span><span class="muted" id="kc">0 key(s)</span></div>
-    <div class="tokline" id="tokres" style="display:none"></div>
-    <div class="row" style="margin:14px 0 8px"><b class="muted">MODELS</b><span class="sp"></span><button class="btn" id="lm">↻ Load Models</button></div>
-    <textarea id="models" readonly>Click “Load Models” to list models for your key.</textarea>
+    <div class="row" style="margin:10px 0"><button class="btn" id="addk">+ Add key</button><button class="btn" id="showk">👁 Show</button><button class="btn" id="chk">✓ Check keys</button><button class="btn" id="morek" style="display:none">▼ See more</button><span class="sp"></span><span class="muted" id="kc">0 key(s)</span></div>
+    <div class="row" style="margin:14px 0 8px"><b class="muted">MODELS</b><span class="sp"></span><button class="btn" id="lm" title="Models load automatically — press to refresh now">↻ Refresh</button></div>
+    <textarea id="models" readonly>Models load automatically when a valid key is added.</textarea>
    </div>
   </div>
   <div class="tab" id="t2">
@@ -256,7 +264,7 @@ export default{async fetch(req){
   return new Response(audio,{headers:{...C,'Content-Type':'audio/mpeg'}});
  }catch(e){return new Response(String(e),{status:500,headers:C})}
 }}</script>
-   <div class="row" style="margin:10px 0 0"><button class="btn" id="clonebtn2">🎙 Clone voice</button><span class="muted">Free · no tokens</span></div><div id="clist"></div>
+   <div class="row" style="margin:10px 0 0"><button class="btn" id="clonebtn2">🎙 Clone voice</button><span class="muted">Free · no tokens</span></div><div class="row" style="margin:12px 0 4px"><b class="muted" id="ccount"></b><span class="sp"></span><input type="text" id="csearch" placeholder="Search voices…" style="max-width:200px;display:none"></div><div id="clist"></div>
    <label class="lab">Text model (transcribe + translate)</label><input type="text" id="tm" list="dl-text" value="gemini-3.5-flash-lite">
    <label class="lab">Gemini voice model</label><input type="text" id="vm" list="dl-tts" value="gemini-3.8-flash-lite-tts">
    <label class="lab">Male / female Gemini voices</label><div class="krow"><input type="text" id="vmale" value="Charon"><input type="text" id="vfem" value="Kore"></div>
@@ -267,9 +275,10 @@ export default{async fetch(req){
    <label class="lab">CUSTOM SRT SUBTITLES (OPTIONAL)</label>
    <p class="muted">If you already have English subtitles, paste them or upload a file. Gemini will translate them directly into Khmer instead of transcribing the audio.</p>
    <div class="row" style="margin:6px 0"><b class="muted">SRT FILE</b><span class="sp"></span><button class="btn" id="srtpick">CHOOSE FILE</button></div>
-   <input type="file" id="srtfile" accept=".srt,.txt" hidden>
+   <input type="file" id="srtfile" accept=".srt,.vtt,.txt,text/plain" hidden>
+   <div class="srtdrop" id="srtdrop"><b>⬆ Drag &amp; drop a .srt / .vtt / .txt file here</b><span class="muted">or click here · plain text is turned into SRT automatically</span></div>
    <textarea id="srtin" style="height:300px" placeholder="1&#10;00:00:01,000 --> 00:00:04,000&#10;Hello world"></textarea>
-   <div class="row" style="margin:10px 0 0"><button class="exp" id="intl" style="margin:0;padding:12px 22px;font-size:15px">⏱ In timeline</button><span class="muted" style="font-size:13px;flex:1 1 200px">Send these cues straight into the Khmer Script box (no translation), then edit and voice them.</span></div>
+   <div class="row" style="margin:10px 0 0"><button class="exp" id="intl" style="margin:0;padding:12px 22px;font-size:15px">⏱ In timeline</button><button class="btn" id="txt2srt" style="padding:12px 18px;font-size:15px" title="Turn plain text (no timestamps) into SRT">📝 Plain text → SRT</button><span class="muted" style="font-size:13px;flex:1 1 200px">Send these cues straight into the Khmer Script box (no translation), then edit and voice them.</span></div>
   </div>
  </div>
 </div>
@@ -348,6 +357,10 @@ export default{async fetch(req){
  <div class="row" style="margin:0 0 6px"><h3 style="margin:0">⚙ Settings</h3><span class="sp"></span><button class="btn" id="sclose">✕</button></div>
  <label class="lab">API KEYS</label>
  <div class="row" style="margin:0"><button class="btn" id="kexp">⬇ Download all API keys</button><button class="btn" id="kimp">⬆ Import API keys</button></div>
+ <label class="lab">TOKENS &amp; KEY STATUS</label>
+ <div id="kstatus" style="margin:0 0 10px"></div>
+ <div class="row" style="margin:0"><button class="btn" id="ktot" title="Add up the tokens used by all your keys">🔢 My tokens</button><button class="btn" id="kreset" title="Try skipped keys again now">↺ Retry skipped</button></div>
+ <div class="tokline" id="tokres" style="display:none;margin-top:10px"></div>
  <label class="lab">VOICE CLONES</label>
  <div class="row" style="margin:0"><button class="btn" id="cexp">⬇ Download clone voices</button><button class="btn" id="cimp">⬆ Import clone voices</button></div>
  <p class="muted" style="font-size:12px">Use these to move to another device: download here, then import on the new device. Imports are merged with what you already have.</p>
@@ -413,24 +426,29 @@ function kFail(k,m,status,j){const txt=JSON.stringify(j||{}),msg=(j&&j.error&&j.
  else{ms=20000;why='server busy ('+status+')'}
  kS(k).cd[m]={until:Date.now()+ms,why};kSave();return{ms,why}}
 function track(k,u){u=u||{};const i=u.promptTokenCount||0,o=(u.candidatesTokenCount||0)+(u.thoughtsTokenCount||0),s=kS(k);s.in+=i;s.out+=o;s.calls++;s.life=(s.life||0)+i+o;sess.in+=i;sess.out+=o;sess.calls++;kSave();refreshTok()}
-function refreshKeyInfo(){document.querySelectorAll('.kinfo').forEach(el=>{const k=keys[+el.dataset.i];if(!k){el.textContent='';return}const s=kS(k),cs=Object.entries(s.cd);
- let h=`Today: <b>${fmtN(s.in+s.out)}</b> tokens (in ${fmtN(s.in)} · out ${fmtN(s.out)}) · ${s.calls} call(s) · `;
- if(cs.length){const[m,c]=cs.sort((a,b)=>b[1].until-a[1].until)[0];h+=`<span class="kw">⏸ skipped until ${hhmm(c.until)} · ${c.why}${m?' · '+m:''}</span>`}else h+='<span class="kok">● ready</span>';el.innerHTML=h})}
+function refreshKeyInfo(){const box=$('#kstatus');if(!box)return;const rows=[];
+ keys.forEach((k,i)=>{if(!k)return;const s=kS(k),cs=Object.entries(s.cd);
+  let h=`<div class="kinfo"><b>Key #${i+1}</b> …${k.slice(-4)} — today <b>${fmtN(s.in+s.out)}</b> tokens (in ${fmtN(s.in)} · out ${fmtN(s.out)}) · ${s.calls} call(s) · `;
+  if(cs.length){const[m,c]=cs.sort((x,y)=>y[1].until-x[1].until)[0];h+=`<span class="kw">⏸ skipped until ${hhmm(c.until)} · ${c.why}${m?' · '+m:''}</span>`}else h+='<span class="kok">● ready</span>';
+  rows.push(h+'</div>')});
+ box.innerHTML=rows.join('')||'<span class="muted">No API keys yet.</span>'}
 /* estimate: audio 32 tok/s in; text ≈7 tok/s (speech) / ≈12 tok/s (Khmer); Gemini voice out ≈22 tok/s */
 function estimate(){const d=dur||v.duration||0;if(!d||!isFinite(d))return null;const custom=$('#srtin').value.trim(),useG=$('#eng').value==='gemini';
  const a=custom?0:32*d+350+7*d,t=7*d+300+12*d,sv=useG?12*d+22*d:0;return{d,a,t,s:sv,total:a+t+sv}}
 function refreshTok(){refreshKeyInfo();const e=estimate(),ks=valid(),rd=ks.filter(k=>!Object.keys(kS(k).cd).length).length;
- $('#tokline').innerHTML=`🔢 ${e?`Estimate <b>≈${fmtN(e.total)}</b> tokens for this ${e.d.toFixed(0)}s video (≈${Math.round(e.total/e.d)} per second)`:'Load a video to see the token estimate'} · This run: <b>${fmtN(sess.in+sess.out)}</b> (in ${fmtN(sess.in)} · out ${fmtN(sess.out)}, ${sess.calls} call(s)) · Keys ready <b>${rd}/${ks.length}</b>`;
+ $('#tokline').innerHTML=e?`🔢 Token estimate <b>≈${fmtN(e.total)}</b> for this ${e.d.toFixed(0)}s video (≈${Math.round(e.total/e.d)} per second)`:'';$('#tokline').parentElement.style.display=e?'':'none';
  $('#tokdet').textContent=e?`Estimate breakdown — transcribe ≈${fmtN(e.a)} · translate ≈${fmtN(e.t)} · Gemini voice ≈${fmtN(e.s)}${$('#eng').value==='gemini'?'':' (Edge voice = 0 tokens)'}`:''}
 /* keys */
 let keys=[];try{keys=JSON.parse(localStorage.getItem('kd_keys')||'[]')}catch(e){}
 if(!keys.length)keys=[''];
-function drawKeys(){const k=$('#keys');k.innerHTML='';keys.forEach((val,i)=>{const r=document.createElement('div');r.className='krow';
+let showAllK=false;
+function drawKeys(){const k=$('#keys');k.innerHTML='';keys.forEach((val,i)=>{if(!showAllK&&i>=2)return;const r=document.createElement('div');r.className='krow';
  r.innerHTML=`<input type="${showKeys?'text':'password'}" placeholder="AIzaSy… paste Gemini key"><span class="rd ${kst[i]||''}">${kst[i]==='ok'?'Ready':kst[i]==='bad'?'Invalid':''}</span><button class="btn">✕</button>`;
- r.children[0].value=val;r.children[0].oninput=e=>{keys[i]=e.target.value.trim();kst[i]='';saveKeys()};
- r.children[2].onclick=()=>{keys.splice(i,1);kst.splice(i,1);if(!keys.length)keys=[''];drawKeys()};k.appendChild(r);const inf=document.createElement('div');inf.className='kinfo';inf.dataset.i=i;k.appendChild(inf)});saveKeys();refreshKeyInfo()}
+ r.children[0].value=val;r.children[0].oninput=e=>{keys[i]=e.target.value.trim();kst[i]='';saveKeys();autoModels()};
+ r.children[2].onclick=()=>{keys.splice(i,1);kst.splice(i,1);if(!keys.length)keys=[''];drawKeys()};k.appendChild(r)});{const mk=$('#morek');mk.style.display=keys.length>2?'':'none';mk.textContent=showAllK?'▲ See less':`▼ See more (${keys.length-2})`}saveKeys();refreshKeyInfo()}
 function saveKeys(){try{localStorage.setItem('kd_keys',JSON.stringify(keys))}catch(e){}$('#kc').textContent=keys.filter(Boolean).length+' key(s)'}
-$('#addk').onclick=()=>{keys.push('');drawKeys()};
+$('#addk').onclick=()=>{keys.push('');if(keys.length>2)showAllK=true;drawKeys()};
+$('#morek').onclick=()=>{showAllK=!showAllK;drawKeys()};
 $('#showk').onclick=()=>{showKeys=!showKeys;$('#showk').textContent=showKeys?'🙈 Hide':'👁 Show';drawKeys()};
 drawKeys();
 const valid=()=>keys.filter(Boolean);
@@ -459,12 +477,20 @@ $('#ktot').onclick=()=>{const ks=valid();if(!ks.length)return log('Add at least 
  let I=0,O=0,C=0,L=0,w=0;const rows=ks.map(k=>{const q=kS(k),n=keys.indexOf(k)+1,paused=Object.keys(q.cd).length>0;I+=q.in;O+=q.out;C+=q.calls;L+=q.life||0;if(paused)w++;
   return `<div>Key #${n} …${k.slice(-4)} — <b>${fmtN(q.in+q.out)}</b> tokens · ${q.calls} call(s) ${paused?'<span class="kw">⏸ skipped</span>':'<span class="kok">● ready</span>'}</div>`}).join('');
  const box=$('#tokres');box.style.display='block';
- box.innerHTML=`<b>🔢 Total today (${ks.length} key${ks.length>1?'s':''}): ${fmtN(I+O)} tokens</b><br><small>in ${fmtN(I)} · out ${fmtN(O)} · ${C} call(s) · ${ks.length-w} ready / ${w} skipped · all time in this browser: ${fmtN(L)}</small><div style="margin-top:8px;font-size:13px">${rows}</div><small>Counts only what this app sent from this browser. Resets daily at midnight Pacific time. Google does not report your remaining free quota.</small>`;
- log(`Total tokens today across ${ks.length} key(s): ${fmtN(I+O)} (in ${fmtN(I)} · out ${fmtN(O)}).`,'ai','ok')};
+ box.innerHTML=`<b>🔢 Total today (${ks.length} key${ks.length>1?'s':''}): ${fmtN(I+O)} tokens</b><br><small>in ${fmtN(I)} · out ${fmtN(O)} · ${C} call(s) · ${ks.length-w} ready / ${w} skipped · this run: ${fmtN(sess.in+sess.out)} · all time in this browser: ${fmtN(L)}</small><div style="margin-top:8px;font-size:13px">${rows}</div><small>Counts only what this app sent from this browser. Resets daily at midnight Pacific time. Google does not report your remaining free quota.</small>`;};
 $('#kreset').onclick=()=>{for(const id in kstat)kstat[id].cd={};kSave();refreshTok();log('Cleared all skips — every key will be tried again.','ai','ok')};
-v.addEventListener('loadedmetadata',refreshTok);$('#eng').addEventListener('change',refreshTok);$('#srtin').addEventListener('input',refreshTok);setInterval(refreshTok,20000);refreshTok();
+v.addEventListener('loadedmetadata',refreshTok);$('#eng').addEventListener('change',refreshTok);$('#srtin').addEventListener('input',refreshTok);setInterval(refreshTok,20000);refreshTok();new MutationObserver(()=>{if($('#sm').classList.contains('on'))refreshTok()}).observe($('#sm'),{attributes:true,attributeFilter:['class']});
 $('#chk').onclick=async()=>{const ks=keys;for(let i=0;i<ks.length;i++){if(!ks[i])continue;try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',{headers:{'x-goog-api-key':ks[i]}});kst[i]=r.ok?'ok':'bad';log(`Key #${i+1}: ${r.ok?'OK':'invalid ('+r.status+')'}`,'ai',r.ok?'ok':'err')}catch(e){kst[i]='bad';log(`Key #${i+1}: ${e.message}`,'ai','err')}}drawKeys();{const ok=ks.filter((k,i)=>k&&kst[i]==='ok');if(ok.length)await syncKeys(ok);else log('No valid key to sync to Google.','ai','warn')}};
-$('#lm').onclick=async()=>{try{ki=0;const j=await gem('models?pageSize=100',null,'GET');const ns=j.models.filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));$('#models').value=ns.join('\n');$('#dl-text').innerHTML=ns.filter(x=>!/tts|image|embed|live|native-audio|lyria|robotics/.test(x)).map(x=>`<option value="${x}">`).join('');$('#dl-tts').innerHTML=ns.filter(x=>/tts/.test(x)).map(x=>`<option value="${x}">`).join('');log('Models loaded.','ai','ok')}catch(e){log('Load models failed: '+e.message,'ai','err')}};
+let lmBusy=false,lmT;
+function fillModels(ns){$('#models').value=ns.join('\n');$('#dl-text').innerHTML=ns.filter(x=>!/tts|image|embed|live|native-audio|lyria|robotics/.test(x)).map(x=>`<option value="${x}">`).join('');$('#dl-tts').innerHTML=ns.filter(x=>/tts/.test(x)).map(x=>`<option value="${x}">`).join('')}
+async function loadModels(manual){if(lmBusy||!valid().length)return;lmBusy=true;$('#lm').disabled=true;
+ try{const j=await gem('models?pageSize=100',null,'GET');const ns=j.models.filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));fillModels(ns);
+  try{localStorage.setItem('kd_models',JSON.stringify({t:Date.now(),ns}))}catch(e){}if(manual)log('Models loaded.','ai','ok')}
+ catch(e){if(manual)log('Load models failed: '+e.message,'ai','err')}
+ lmBusy=false;$('#lm').disabled=false}
+const autoModels=()=>{clearTimeout(lmT);lmT=setTimeout(()=>{if(valid().some(k=>k.length>30))loadModels()},1200)};
+$('#lm').onclick=()=>loadModels(true);
+try{const c=JSON.parse(localStorage.getItem('kd_models')||'null');if(c&&c.ns&&c.ns.length){fillModels(c.ns);if(Date.now()-c.t>432e5)setTimeout(loadModels,1500)}else setTimeout(loadModels,1500)}catch(e){setTimeout(loadModels,1500)}
 /* upload */
 const drop=$('#drop');
 drop.onclick=()=>$('#file').click();
@@ -476,7 +502,23 @@ function setFile(f){if(!f)return;file=f;v.src=URL.createObjectURL(f);$('#stage')
 $('#orig').oninput=e=>{$('#ov').textContent=e.target.value+'%';v.volume=e.target.value/100};
 $('#sp').oninput=e=>$('#spv').textContent=e.target.value;
 $('#srtpick').onclick=()=>$('#srtfile').click();
-$('#srtfile').onchange=async e=>{const f=e.target.files[0];if(f){$('#srtin').value=await f.text();log('SRT loaded: '+f.name,'ai','ok')}};
+function vttToSrt(t){return t.replace(/^WEBVTT[^\n]*\n/,'').replace(/(^|\s)(\d\d:\d\d)\.(\d{3})/gm,'$100:$2,$3').replace(/(\d\d:\d\d:\d\d)\.(\d{3})/g,'$1,$2').replace(/(-->\s*\d\d:\d\d:\d\d,\d{3}).*/g,'$1')}
+function textToSrt(t){const d=(v.duration&&isFinite(v.duration))?v.duration:0,parts=[];
+ const chunk=x=>{while(x.length>84){let k=x.lastIndexOf(' ',84);if(k<30)k=84;parts.push(x.slice(0,k).trim());x=x.slice(k).trim()}if(x)parts.push(x)};
+ t.replace(/\r/g,'').split(/\n+/).forEach(l=>{l=l.trim();if(!l)return;(l.match(/[^.!?។៕]+[.!?។៕]*/g)||[l]).forEach(x=>{x=x.trim();if(x)chunk(x)})});
+ if(!parts.length)return '';
+ const w=parts.map(x=>Math.max(8,x.length)),sum=w.reduce((a,b)=>a+b,0),total=d||Math.max(parts.length*1.5,sum/14);let at=0;
+ return parts.map((x,i)=>{const a=at,b=at+total*w[i]/sum;at=b;return (i+1)+'\n'+fmt(a)+' --> '+fmt(Math.max(a+.3,b-.05))+'\n'+x}).join('\n\n')+'\n'}
+async function loadSrtFile(f){if(!f)return;let t=(await f.text()).replace(/^\uFEFF/,'');
+ if(/^WEBVTT/.test(t.trim()))t=vttToSrt(t.trim());
+ if(!t.includes('-->')){t=textToSrt(t);log('Plain text converted to SRT: '+f.name+' (timings spread by text length).','ai','ok')}else log('SRT loaded: '+f.name,'ai','ok');
+ $('#srtin').value=t;refreshTok()}
+$('#srtfile').onchange=async e=>{await loadSrtFile(e.target.files[0]);e.target.value=''};
+{const sd=$('#srtdrop'),ta=$('#srtin');sd.onclick=()=>$('#srtfile').click();
+ [sd,ta].forEach(el=>{['dragenter','dragover'].forEach(n=>el.addEventListener(n,e=>{e.preventDefault();sd.classList.add('over')}));
+  el.addEventListener('dragleave',e=>{e.preventDefault();sd.classList.remove('over')});
+  el.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();sd.classList.remove('over');loadSrtFile(e.dataTransfer.files[0])})})}
+$('#txt2srt').onclick=()=>{const t=$('#srtin').value.trim();if(!t)return log('Type or paste plain text first.','ai','warn');if(t.includes('-->'))return log('This is already SRT.','ai','warn');$('#srtin').value=textToSrt(t);refreshTok();log('Plain text converted to SRT. Timings are spread by text length across the video — adjust if needed.','ai','ok')};
 /* helpers */
 const step=n=>{for(let i=1;i<=3;i++)$('#s'+i).className='step'+(i<n?' ok':i==n?' on':'')};
 const prog=p=>$('#prog').style.width=p+'%';
@@ -511,11 +553,19 @@ const norm=a=>a.filter(s=>s.text&&s.end>s.start).map(s=>({start:+s.start,end:+s.
 /* voice clones */
 let clones=[];try{clones=JSON.parse(localStorage.getItem('kd_clones')||'[]')}catch(e){}
 const COL=['#059669','#e9b062','#f27a93','#a970f7','#7fb0e0','#c264fa','#98989e'];let ccol=COL[0],cwav=null,cg='m';
-const saveClones=()=>{try{localStorage.setItem('kd_clones',JSON.stringify(clones))}catch(e){log('Could not save clone (storage full).','voice','warn')}};
+const cdb=()=>new Promise((ok,no)=>{const r=indexedDB.open('kd_store',1);r.onupgradeneeded=()=>r.result.createObjectStore('clones',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+async function idbSave(){const db=await cdb();await new Promise((ok,no)=>{const t=db.transaction('clones','readwrite'),st=t.objectStore('clones');st.clear();clones.forEach(c=>st.put(c));t.oncomplete=ok;t.onerror=()=>no(t.error)});db.close()}
+const saveClones=()=>{idbSave().then(()=>{try{localStorage.removeItem('kd_clones')}catch(e){}}).catch(()=>{try{localStorage.setItem('kd_clones',JSON.stringify(clones))}catch(e){log('Could not save clone (storage full).','voice','warn')}})};
+async function idbLoad(){try{const db=await cdb(),all=await new Promise((ok,no)=>{const q=db.transaction('clones').objectStore('clones').getAll();q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)});db.close();let add=0;all.forEach(c=>{if(!clones.some(x=>x.id===c.id)){clones.push(c);add++}});if(clones.length&&(add||localStorage.getItem('kd_clones')))saveClones();if(add)drawClones()}catch(e){}}
 function drawClones(){const rt=$('#route');[...rt.querySelectorAll('[data-c]')].forEach(o=>o.remove());
  clones.forEach(c=>{const o=document.createElement('option');o.value='c:'+c.id;o.dataset.c=1;o.textContent='🎙 '+c.name+' (clone)';rt.appendChild(o)});
- $('#clist').innerHTML='';clones.forEach(c=>{const d=document.createElement('div');d.className='cl';d.innerHTML=`<i style="background:${c.color}"></i><b></b><span class="muted">${c.g==='m'?'♂':'♀'} → ${c.base}</span><span class="sp"></span><button class="btn">✕</button>`;
-  d.children[1].textContent=c.name;d.children[4].onclick=()=>{clones=clones.filter(x=>x!==c);saveClones();drawClones()};$('#clist').appendChild(d)})}
+ {const q=($('#csearch').value||'').toLowerCase();$('#ccount').textContent=clones.length?clones.length+' saved voice'+(clones.length>1?'s':''):'No saved voices yet — press “Clone voice”';$('#csearch').style.display=clones.length>5?'':'none';
+ $('#clist').innerHTML='';clones.filter(c=>c.name.toLowerCase().includes(q)).forEach(c=>{const d=document.createElement('div');d.className='cl';
+  d.innerHTML=`<i style="background:${c.color}"></i><b></b><span class="muted">${c.g==='m'?'♂':'♀'} → ${c.base}</span><span class="sp"></span><button class="btn" title="Play sample">▶</button><button class="btn" title="Rename">✎</button><button class="btn" title="Delete">✕</button>`;
+  d.children[1].textContent=c.name;
+  d.children[4].onclick=()=>{const a=new Audio('data:audio/wav;base64,'+c.wav);a.play().catch(()=>{})};
+  d.children[5].onclick=()=>{const n=prompt('Rename voice',c.name);if(n&&n.trim()){c.name=n.trim();saveClones();drawClones()}};
+  d.children[6].onclick=()=>{if(confirm('Delete voice “'+c.name+'”?')){clones=clones.filter(x=>x!==c);saveClones();drawClones()}};$('#clist').appendChild(d)})}}
 $('#csw').innerHTML=COL.map((c,i)=>`<i style="background:${c}" class="${i?'':'on'}" data-c="${c}"></i>`).join('');
 $('#csw').onclick=e=>{if(!e.target.dataset.c)return;ccol=e.target.dataset.c;[...$('#csw').children].forEach(x=>x.classList.toggle('on',x===e.target))};
 const openClone=()=>{cwav=null;$('#cname').value='';$('#ctext').value='';$('#cdt').textContent='Drop an audio file here or click to browse';$('#cdrop').classList.remove('has');$('#cprev').style.display='none';$('#cm').classList.add('on')};
@@ -543,7 +593,7 @@ $('#cok').onclick=async()=>{const name=$('#cname').value.trim();if(!name)return 
  clones.push({id:Date.now().toString(36),name,color:ccol,g:cg,base:$('#cbase').value,text,wav:b64(cwav)});saveClones();drawClones();
  log(`Voice clone <b>${name}</b> created → base voice ${$('#cbase').value}. Select it in Pipeline → Voice routing.`,'voice','ok');
  $('#route').value='c:'+clones[clones.length-1].id;$('#cm').classList.remove('on');b.disabled=false};
-drawClones();
+drawClones();idbLoad();$('#csearch').oninput=drawClones;
 
 /* settings (password gate, backup, sheet sync) */
 async function syncKeys(list,verbose){
@@ -685,7 +735,7 @@ $('#bedgedl').onclick=async()=>{if(!segs.length)return log('No subtitles yet.','
   if(!fail){edgeOK=true;buffers=eb;$('#eng').value='edge';$('#dl').click();return}
   edgeOK=false}
  log('Direct Edge download is blocked in this browser. Best fix: paste the free Edge proxy URL in Pipeline → Edge proxy (no recording needed).','voice','warn');await recordEdge()};
-$('#intl').onclick=()=>{const t=$('#srtin').value.trim();if(!t)return log('Paste or choose an SRT first.','ai','warn');const p=parseSrt(t);
+$('#intl').onclick=()=>{const t=$('#srtin').value.trim();if(!t)return log('Paste or choose an SRT first.','ai','warn');const p=parseSrt(t.includes('-->')?t:textToSrt(t));
  if(!p.length)return log('Could not read this SRT. Each cue needs a line like 00:00:01,000 --> 00:00:04,000.','ai','err');
  stopAll();buffers=[];segs=p.map(x=>({start:x.start,end:x.end,text:x.text,g:'m'}));renderSegs();$('#cont').style.display='none';
  $('#vnote').textContent='✏️ Edit the lines if needed, then press “🔈 Dub to voice” or “🔊 Edge voice”.';log(`${segs.length} line(s) sent to the timeline (Khmer Script).`,'ai','ok');

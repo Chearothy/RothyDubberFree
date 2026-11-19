@@ -369,7 +369,7 @@ export default{async fetch(req){
  <div class="row" style="margin:8px 0"><button class="btn" id="gsopen">↗ Open sheet</button><button class="btn" id="gscopyk">⧉ Copy keys (paste into sheet)</button></div>
  <p class="muted" style="font-size:13px;margin:0 0 8px"><b>Load</b> reads keys straight from the link above (the sheet must be shared as “Anyone with the link – Viewer”). A browser can’t <b>save</b> to a plain Sheet link, so for one-click saving paste the Web app URL of a small Apps Script attached to the sheet (code below); otherwise use “Copy keys” and paste them into the sheet.</p>
  <input type="text" id="gsurl" placeholder="https://script.google.com/macros/s/…/exec" value ="https://script.google.com/macros/s/AKfycbxuBgYTd4IhUS_9cFv6oDoOgpqt8WRA8bPtk9A4PT98v9KsCy2iiMVZ1THYGV0iN3mM/exec">
- <input type="password" id="gssec" placeholder="Secret (same as SECRET in the script)" style="margin-top:8px">
+ <input type="password" id="gssec" placeholder="Secret (same as SECRET in the script)" style="margin-top:8px" value ="1092001">
  <div class="row" style="margin:10px 0 0"><button class="btn" id="gssave">☁ Save keys to sheet</button><button class="btn" id="gsload">☁ Load keys from sheet</button></div>
  <details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Apps Script code (how to set up)</summary>
   <p class="muted" style="font-size:12px">In your sheet: Extensions → Apps Script → paste → set SECRET → Deploy → New deployment → Web app → Execute as <i>Me</i>, access <i>Anyone</i> → copy the URL.</p>

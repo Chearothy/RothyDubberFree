@@ -373,7 +373,7 @@ export default{async fetch(req){
  <p class="muted" style="font-size:13px;margin:0 0 8px"><b>Load</b> reads keys straight from the link above (the sheet must be shared as “Anyone with the link – Viewer”). A browser can’t <b>save</b> to a plain Sheet link, so for one-click saving paste the Web app URL of a small Apps Script attached to the sheet (code below); otherwise use “Copy keys” and paste them into the sheet.</p>
  <input type="text" id="gsurl" placeholder="https://script.google.com/macros/s/…/exec">
  <input type="password" id="gssec" placeholder="Secret (same as SECRET in the script)" style="margin-top:8px">
- <div class="row" style="margin:8px 0 0"><button class="btn" id="gsshow">👁 Show secret</button><button class="btn" id="gsreset">↺ Reset to defaults</button></div>
+ <div class="row" style="margin:8px 0 0"><button class="btn" id="gsshow">👁 Show secret</button><button class="btn" id="gsreset">↺ Reset to defaults</button><button class="btn" id="gsdef" title="Copy lines to paste into the HTML as the new defaults for every device">📋 Copy as defaults</button></div>
  <div class="row" style="margin:10px 0 0"><button class="btn" id="gssave">☁ Save keys to sheet</button><button class="btn" id="gsload">☁ Load keys from sheet</button></div>
  <details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Apps Script code (how to set up)</summary>
   <p class="muted" style="font-size:12px">In your sheet: Extensions → Apps Script → paste → set SECRET → Deploy → New deployment → Web app → Execute as <i>Me</i>, access <i>Anyone</i> → copy the URL.</p>
@@ -660,9 +660,18 @@ $('#impf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)
   else{const ids=new Set(clones.map(c=>c.id));let n=0;(j.clones||[]).forEach(c=>{if(c&&c.id&&!ids.has(c.id)){clones.push(c);n++}});saveClones();drawClones();log(`Imported ${n} new clone voice(s).`,'voice','ok')}
  }catch(err){log('Import failed: '+err.message,'ai','err')}};
 $('#gssave').onclick=()=>syncKeys(keys.filter(Boolean),true);
-$('#gsload').onclick=async()=>{const u=$('#gsurl').value.trim();if(!u)return loadDirect();
- try{const r=await fetch(u+(u.includes('?')?'&':'?')+'secret='+encodeURIComponent($('#gssec').value));const t=await r.text();if(t==='denied')throw new Error('Wrong secret.');
-  const a=JSON.parse(t),have=new Set(keys);let n=0;a.forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();}catch(e){log('Sheet load failed: '+e.message,'ai','err')}};
+async function pullKeys(manual){const u=$('#gsurl').value.trim();let a=null;
+ if(u){try{const r=await fetch(u+(u.includes('?')?'&':'?')+'secret='+encodeURIComponent($('#gssec').value));const t=(await r.text()).trim();
+  if(t==='denied'){if(manual)log('Sheet load denied: the Secret does not match SECRET in the Apps Script.','ai','err');return -1}a=JSON.parse(t)}catch(e){if(manual)log('Sheet load failed: '+e.message,'ai','err')}}
+ if(!a){const m=$('#gslink').value.match(/\/d\/([\w-]+)/);if(m){try{const r=await fetch('https://docs.google.com/spreadsheets/d/'+m[1]+'/gviz/tq?tqx=out:csv');if(r.ok)a=[...new Set((await r.text()).match(/AIza[\w-]{30,}/g)||[])]}catch(e){}}}
+ if(!a){if(manual)log('Could not read the Google Sheet (check the Web app URL, or share the sheet as “Anyone with the link – Viewer”).','ai','err');return -1}
+ const have=new Set(keys);let n=0;a.forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});
+ if(n){kst=[];drawKeys();autoModels()}
+ if(manual||n)log(n?`Loaded ${n} new API key(s) from your Google Sheet.`:'Google Sheet checked — no new keys.','ai','ok');return n}
+$('#gsload').onclick=()=>pullKeys(true);
+$('#gsdef').onclick=()=>{const q=x=>"'"+String(x).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";const t='const DEFAULT_SHEET='+q($('#gslink').value.trim())+';\nconst DEFAULT_URL='+q($('#gsurl').value.trim())+',DEFAULT_SECRET='+q($('#gssec').value)+';';
+ try{navigator.clipboard.writeText(t);log('Copied. Paste it over the DEFAULT_SHEET / DEFAULT_URL / DEFAULT_SECRET lines in the HTML file so every device starts with these.','ai','ok')}catch(e){prompt('Copy this:',t)}};
+setTimeout(()=>pullKeys(false),900);
 $('#tgt').onchange=()=>{$('#hl').textContent=LG()==='km'?'Khmer':'English';$('#s3t').textContent=LG()==='km'?'Khmer voice':'English voice';if(segs.length)renderSegs()};
 
 /* modes: "Audio + subtitle" asks before voicing; "Transcribe + translate" stops so the subtitles can be edited */

@@ -155,6 +155,7 @@ main{padding-bottom:max(48px,env(safe-area-inset-bottom))}
 .tokline{border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:16px;font-size:14px;line-height:1.55}
 .tokline small{display:block;margin-top:4px;font-size:12.5px}
 .kinfo{font-size:12.5px;color:var(--mu);margin:-4px 2px 12px;line-height:1.6}.kw{color:#fbbf24;font-weight:700}.kok{color:#34d399;font-weight:700}
+.edgehelp{margin:8px 0;font-size:13px;color:var(--mu)}.edgehelp summary{cursor:pointer;font-weight:700;color:var(--tx);min-height:36px;display:flex;align-items:center}.edgehelp textarea{width:100%;margin:8px 0}
 </style></head>
 <body>
 <header>
@@ -222,6 +223,39 @@ main{padding-bottom:max(48px,env(safe-area-inset-bottom))}
    <select class="f" id="eng"><option value="gemini">Gemini TTS — natural Khmer, exportable</option><option value="edge">Edge voices — Piseth / Sreymom (free, no API, downloadable)</option><option value="browser">Edge/browser voice — Sreymom / Piseth (live preview only)</option></select>
    <label class="lab">VOICE ROUTING</label>
    <select class="f" id="route"><option value="auto">Auto from subtitle gender (♂ Piseth / ♀ Sreymom)</option><option value="m">Piseth (male only)</option><option value="f">Sreymom (female only)</option></select>
+   <label class="lab">EDGE PROXY (FREE) — real Piseth / Sreymom download</label>
+   <input type="text" id="edgeprox" placeholder="https://your-name.workers.dev">
+   <details class="edgehelp"><summary>How to get this URL (free, about 2 minutes)</summary>
+    <ol><li>Open <b>dash.cloudflare.com</b> → <b>Workers &amp; Pages</b> → <b>Create</b> → <b>Hello World</b> → Deploy.</li><li>Press <b>Edit code</b>, delete everything, paste the code below, press <b>Deploy</b>.</li><li>Copy the <b>…workers.dev</b> address into the box above.</li></ol>
+    <textarea id="edgewk" readonly style="height:170px;font:12px monospace"></textarea><button class="btn" id="edgewkc">⧉ Copy worker code</button>
+   </details>
+   <script type="text/plain" id="edgewkcode">const T='6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+const C={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*'};
+const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+async function gec(){let t=Math.floor(Date.now()/1000)+11644473600;t-=t%300;
+ const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(BigInt(t)*10000000n)+T));
+ return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase()}
+export default{async fetch(req){
+ if(req.method==='OPTIONS')return new Response(null,{headers:C});
+ try{
+  const j=await req.json(),text=j.text,voice=j.voice||'km-KH-SreymomNeural',id=crypto.randomUUID().replace(/-/g,'');
+  const res=await fetch('https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken='+T+'&ConnectionId='+id+'&Sec-MS-GEC='+(await gec())+'&Sec-MS-GEC-Version=1-130.0.2849.68',
+   {headers:{Upgrade:'websocket',Origin:'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold','User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0'}});
+  const ws=res.webSocket;if(!ws)return new Response('Edge refused: '+res.status,{status:502,headers:C});
+  ws.accept();
+  const audio=await new Promise((ok,no)=>{const parts=[];
+   setTimeout(()=>no(new Error('timeout')),20000);
+   ws.addEventListener('message',e=>{
+    if(typeof e.data==='string'){if(e.data.includes('Path:turn.end')){ws.close();let n=0;parts.forEach(p=>n+=p.length);const o=new Uint8Array(n);let q=0;parts.forEach(p=>{o.set(p,q);q+=p.length});ok(o)}}
+    else{const d=new Uint8Array(e.data),h=(d[0]<<8)|d[1];if(new TextDecoder().decode(d.subarray(2,2+h)).includes('Path:audio'))parts.push(d.subarray(2+h))}});
+   ws.addEventListener('error',()=>no(new Error('socket error')));
+   const t=new Date().toISOString();
+   ws.send('X-Timestamp:'+t+'\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}');
+   ws.send('X-RequestId:'+id+'\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:'+t+'\r\nPath:ssml\r\n\r\n<speak version=\'1.0\' xmlns=\'http://www.w3.org/2001/10/synthesis\' xml:lang=\''+voice.slice(0,5)+'\'><voice name=\''+voice+'\'><prosody pitch=\'+0Hz\' rate=\'+0%\' volume=\'+0%\'>'+esc(text)+'</prosody></voice></speak>');
+  });
+  return new Response(audio,{headers:{...C,'Content-Type':'audio/mpeg'}});
+ }catch(e){return new Response(String(e),{status:500,headers:C})}
+}}</script>
    <div class="row" style="margin:10px 0 0"><button class="btn" id="clonebtn2">🎙 Clone voice</button><span class="muted">Free · no tokens</span></div><div id="clist"></div>
    <label class="lab">Text model (transcribe + translate)</label><input type="text" id="tm" list="dl-text" value="gemini-3.5-flash-lite">
    <label class="lab">Gemini voice model</label><input type="text" id="vm" list="dl-tts" value="gemini-3.8-flash-lite-tts">
@@ -595,7 +629,13 @@ const EDGE_T='6A5AA1D4EAFF4E9FB37E23D68491D6F4';let edgeOK=null,edgeStop=null;co
 const evoice=s=>LG()==='km'?(gs(s)==='m'?'km-KH-PisethNeural':'km-KH-SreymomNeural'):(gs(s)==='m'?'en-US-GuyNeural':'en-US-AriaNeural');
 const xesc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 async function edgeGec(){let t=Math.floor(Date.now()/1000)+11644473600;t-=t%300;const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(BigInt(t)*10000000n)+EDGE_T));return[...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase()}
-function edgeSynth(text,voice){return new Promise(async(ok,no)=>{try{
+const EP=()=>(($('#edgeprox')||{}).value||'').trim();
+async function edgeSynth(text,voice){const px=EP();
+ if(px){const r=await fetch(px,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({text,voice})});
+  if(!r.ok)throw new Error('Edge proxy replied '+r.status+' '+(await r.text().catch(()=>'')).slice(0,80));
+  const b=await r.arrayBuffer();if(!b.byteLength)throw new Error('empty audio from proxy');return b}
+ return edgeSynthWS(text,voice)}
+function edgeSynthWS(text,voice){return new Promise(async(ok,no)=>{try{
  const id=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)).replace(/-/g,''),g=await edgeGec(),parts=[];
  const ws=new WebSocket(`wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_T}&ConnectionId=${id}&Sec-MS-GEC=${g}&Sec-MS-GEC-Version=1-130.0.2849.68`);
  ws.binaryType='arraybuffer';const tm=setTimeout(()=>{try{ws.close()}catch(e){}no(new Error('timeout'))},12000);
@@ -617,21 +657,23 @@ async function makeEdge(){const q=segs.map((_,i)=>i);let ok=0,done=0;
  if(!ok){buffers=[];log('Edge online voice can’t be reached from this page, so live browser voices are used (press play on the video). For a file use the ⬇ Edge button, which records the sound.','voice','warn')}
  else log(`Edge voices ready: ${ok} line(s) · free, no API.`,'voice','ok');
  step(4);prog(100)}
+$('#edgeprox').value=localStorage.getItem('kd_edgeprox')||'';$('#edgeprox').oninput=()=>{try{localStorage.setItem('kd_edgeprox',EP())}catch(e){}edgeOK=null};
+$('#edgewk').value=$('#edgewkcode').textContent.trim();$('#edgewkc').onclick=()=>{$('#edgewk').select();(navigator.clipboard?navigator.clipboard.writeText($('#edgewk').value):Promise.reject()).then(()=>log('Worker code copied.','voice','ok')).catch(()=>{document.execCommand('copy');log('Worker code selected — press Copy.','voice','ok')})};
 $('#bedge').onclick=async()=>{if(edgeStop)return edgeStop();if(!segs.length)return log('No subtitles yet.','voice','warn');
  let stop=false;const btn=$('#bedge'),reset=()=>{edgeStop=null;btn.textContent='🔊 Edge voice'};edgeStop=()=>{stop=true;stopAll();reset()};btn.textContent='⏹ Stop';stopAll();
  for(const s of segs){if(stop)break;await edgeLine(s);await sleep(120)}
  if(!stop)reset()};
 async function recordEdge(list=segs,name='khmer-edge-voice.webm'){
  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)return log('This browser can’t record tab audio — use Chrome or Edge on a computer.','voice','err');
- log('Recording: choose “This tab” and tick “Share tab audio” (or Entire screen + “Share system audio”).','voice','warn');
- let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true,preferCurrentTab:true,selfBrowserSurface:'include',systemAudio:'include'})}catch(e){return log('Recording cancelled.','voice','warn')}
+ log('Recording needs the whole computer sound: in the picker choose “Entire screen” and tick “Also share system audio”. (“This tab” records silence because the browser voice is not part of the tab.) You will hear the voice while it records.','voice','warn');
+ let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},systemAudio:'include',selfBrowserSurface:'include',monitorTypeSurfaces:'include'})}catch(e){return log('Recording cancelled.','voice','warn')}
  const at=st.getAudioTracks();if(!at.length){st.getTracks().forEach(t=>t.stop());return log('No audio was shared. Tick “Share tab audio” and try again.','voice','err')}
  const rec=new MediaRecorder(new MediaStream(at)),ch=[];rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data)};const fin=new Promise(r=>rec.onstop=r);rec.start();
  stopAll();for(const s of list){await new Promise(r=>speak(s,r));await sleep(250)}
  await sleep(500);rec.stop();await fin;st.getTracks().forEach(t=>t.stop());
- const blob=new Blob(ch,{type:'audio/webm'});
- try{const ab=await getCtx().decodeAudioData(await blob.arrayBuffer()),d=ab.getChannelData(0);let e=0,n=0;for(let i=0;i<d.length;i+=50){e+=d[i]*d[i];n++}if(Math.sqrt(e/Math.max(1,n))<.002)log('The recording is silent: the browser did not share the voice sound. Try “Entire screen” + “Share system audio”, or Microsoft Edge on Windows.','voice','err')}catch(e){}
- save(blob,name);log('Saved '+name,'voice','ok')}
+ let silent=false;const blob=new Blob(ch,{type:'audio/webm'});
+ try{const ab=await getCtx().decodeAudioData(await blob.arrayBuffer()),d=ab.getChannelData(0);let e=0,n=0;for(let i=0;i<d.length;i+=50){e+=d[i]*d[i];n++}if(Math.sqrt(e/Math.max(1,n))<.002){silent=true;log('Recording is silent, so nothing was saved. Tick “Also share system audio” with “Entire screen”, or set up the free Edge proxy in Pipeline for a clean mp3 download.','voice','err')}}catch(e){}
+ if(silent)return;save(blob,name);log('Saved '+name,'voice','ok')}
 async function dlLine(s){const n=segs.indexOf(s)+1;
  if(edgeOK!==false){try{log('Generating line '+n+'…','voice');const raw=await edgeSynth(s.text,evoice(s));edgeOK=true;save(new Blob([raw],{type:'audio/mpeg'}),'khmer-line-'+n+'-'+(gs(s)==='m'?'piseth':'sreymom')+'.mp3');log('Saved line '+n+' (mp3)','voice','ok');return}catch(e){edgeOK=false;log('Edge voice failed: '+e.message,'voice','warn')}}
  await recordEdge([s],'khmer-line-'+n+'.webm')}
@@ -642,7 +684,7 @@ $('#bedgedl').onclick=async()=>{if(!segs.length)return log('No subtitles yet.','
   await Promise.all(Array.from({length:Math.min(3,q.length)},async()=>{while(q.length&&!fail){const i=q.shift();try{eb[i]=await edgeBuf(segs[i].text,evoice(segs[i]))}catch(e){fail=true;log('Edge voice failed: '+e.message,'voice','err')}}}));
   if(!fail){edgeOK=true;buffers=eb;$('#eng').value='edge';$('#dl').click();return}
   edgeOK=false}
- await recordEdge()};
+ log('Direct Edge download is blocked in this browser. Best fix: paste the free Edge proxy URL in Pipeline → Edge proxy (no recording needed).','voice','warn');await recordEdge()};
 $('#intl').onclick=()=>{const t=$('#srtin').value.trim();if(!t)return log('Paste or choose an SRT first.','ai','warn');const p=parseSrt(t);
  if(!p.length)return log('Could not read this SRT. Each cue needs a line like 00:00:01,000 --> 00:00:04,000.','ai','err');
  stopAll();buffers=[];segs=p.map(x=>({start:x.start,end:x.end,text:x.text,g:'m'}));renderSegs();$('#cont').style.display='none';

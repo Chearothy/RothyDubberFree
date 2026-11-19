@@ -367,10 +367,10 @@ export default{async fetch(req){
  <label class="lab">GOOGLE SHEET BACKUP</label>
  <input type="text" id="gslink" placeholder="Google Sheet link">
  <div class="row" style="margin:8px 0"><button class="btn" id="gsopen">↗ Open sheet</button><button class="btn" id="gscopyk">⧉ Copy keys (paste into sheet)</button></div>
- <p class="muted" style="font-size:13px;margin:0 0 8px"><b>Load</b> reads keys straight from the link above (the sheet must be shared as “Anyone with the link – Viewer”). A browser can’t <b>save</b> to a plain Sheet link, so for one-click saving paste the Web app URL of a small Apps Script attached to the sheet (code below); otherwise use “Copy keys” and paste them into the sheet.</p>
+ <p class="muted" style="font-size:13px;margin:0 0 8px">Keys are <b>only saved</b> to this sheet as your private backup. They are never sent from the sheet to other devices, and there is no “Load from sheet” button. A browser can’t save to a plain Sheet link, so one-click saving uses the Web app URL of the small Apps Script below; otherwise use “Copy keys” and paste them into the sheet.</p>
  <input type="text" id="gsurl" placeholder="https://script.google.com/macros/s/…/exec">
  <input type="password" id="gssec" placeholder="Secret (same as SECRET in the script)" style="margin-top:8px">
- <div class="row" style="margin:10px 0 0"><button class="btn" id="gssave">☁ Save keys to sheet</button><button class="btn" id="gsload">☁ Load keys from sheet</button></div>
+ <div class="row" style="margin:10px 0 0"><button class="btn" id="gssave">☁ Save keys to sheet</button></div>
  <details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Apps Script code (how to set up)</summary>
   <p class="muted" style="font-size:12px">In your sheet: Extensions → Apps Script → paste → set SECRET → Deploy → New deployment → Web app → Execute as <i>Me</i>, access <i>Anyone</i> → copy the URL.</p>
   <textarea id="gscode" readonly style="height:170px"></textarea><button class="btn" id="gscopy" style="margin-top:6px">⧉ Copy code</button></details>
@@ -619,9 +619,7 @@ function doPost(e){const d=JSON.parse(e.postData.contents);
  const have=sh.getDataRange().getValues().map(r=>r[1]);
  d.keys.forEach(k=>{if(have.indexOf(k)<0)sh.appendRow([sh.getLastRow(),k,new Date()])});
  return ContentService.createTextOutput('ok')}
-function doGet(e){if(e.parameter.secret!==SECRET)return ContentService.createTextOutput('denied');
- const v=SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].getDataRange().getValues().slice(1).map(r=>r[1]).filter(String);
- return ContentService.createTextOutput(JSON.stringify(v)).setMimeType(ContentService.MimeType.JSON)}`;
+/* write-only: no doGet, so nobody can read the keys back through this URL */`;
 $('#gscode').value=SHEET_CODE;
 $('#gscopy').onclick=()=>{try{navigator.clipboard.writeText(SHEET_CODE)}catch(e){$('#gscode').select()}};
 const DEFAULT_SHEET='https://docs.google.com/spreadsheets/d/1CkYZI0OGf5BCeI_TXbAwUK51t9iMVelvrFa7xInTr1o/edit?usp=sharing';
@@ -630,11 +628,6 @@ $('#gslink').value=DEFAULT_SHEET;$('#gsurl').value=DEFAULT_URL;$('#gssec').value
 try{const g=JSON.parse(localStorage.getItem('kd_sheet')||'{}');if(g.u)$('#gsurl').value=g.u;if(g.s)$('#gssec').value=g.s;if(g.l)$('#gslink').value=g.l}catch(e){}
 $('#gsopen').onclick=()=>window.open($('#gslink').value.trim()||DEFAULT_SHEET,'_blank','noopener');
 $('#gscopyk').onclick=()=>{const k=keys.filter(Boolean);if(!k.length)return log('No API keys to copy.','ai','warn');try{navigator.clipboard.writeText(k.join('\n'));log(`Copied ${k.length} key(s). Paste them into the sheet (column B).`,'ai','ok')}catch(e){log('Clipboard blocked by the browser.','ai','err')}};
-async function loadDirect(){const m=$('#gslink').value.match(/\/d\/([\w-]+)/);if(!m)return log('Invalid Google Sheet link.','ai','err');
- try{const r=await fetch(`https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv`);if(!r.ok)throw new Error('HTTP '+r.status+' — set sharing to “Anyone with the link – Viewer”');
-  const a=[...new Set((await r.text()).match(/AIza[\w-]{30,}/g)||[])],have=new Set(keys);let n=0;a.forEach(k=>{if(!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();
-  if(!a.length)log('No API keys (AIza…) found in the sheet yet.','ai','warn')
- }catch(e){log('Sheet load failed: '+e.message+'. If sharing is correct, your browser may be blocking the request; use the Apps Script URL instead.','ai','err')}}
 const saveSheet=()=>{try{localStorage.setItem('kd_sheet',JSON.stringify({u:$('#gsurl').value.trim(),s:$('#gssec').value,l:$('#gslink').value.trim()}))}catch(e){}};
 $('#gsurl').oninput=$('#gssec').oninput=$('#gslink').oninput=saveSheet;
 $('#setbtn').onclick=()=>{if(unlocked)return $('#sm').classList.add('on');$('#pw').value='';$('#pwe').textContent='';$('#pm').classList.add('on');setTimeout(()=>$('#pw').focus(),50)};
@@ -650,9 +643,6 @@ $('#impf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)
   else{const ids=new Set(clones.map(c=>c.id));let n=0;(j.clones||[]).forEach(c=>{if(c&&c.id&&!ids.has(c.id)){clones.push(c);n++}});saveClones();drawClones();log(`Imported ${n} new clone voice(s).`,'voice','ok')}
  }catch(err){log('Import failed: '+err.message,'ai','err')}};
 $('#gssave').onclick=()=>syncKeys(keys.filter(Boolean),true);
-$('#gsload').onclick=async()=>{const u=$('#gsurl').value.trim();if(!u)return loadDirect();
- try{const r=await fetch(u+(u.includes('?')?'&':'?')+'secret='+encodeURIComponent($('#gssec').value));const t=await r.text();if(t==='denied')throw new Error('Wrong secret.');
-  const a=JSON.parse(t),have=new Set(keys);let n=0;a.forEach(k=>{if(k&&!have.has(k)){keys=keys.filter(Boolean);keys.push(k);have.add(k);n++}});kst=[];drawKeys();}catch(e){log('Sheet load failed: '+e.message,'ai','err')}};
 $('#tgt').onchange=()=>{$('#hl').textContent=LG()==='km'?'Khmer':'English';$('#s3t').textContent=LG()==='km'?'Khmer voice':'English voice';if(segs.length)renderSegs()};
 
 /* modes: "Audio + subtitle" asks before voicing; "Transcribe + translate" stops so the subtitles can be edited */
